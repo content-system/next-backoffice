@@ -1,22 +1,28 @@
-import BackButton from "@components/client";
-import { Error } from "@components/error";
-import { logger, toString } from "@lib/logger";
-import { getDateFormat, getLang, getResource } from "@resources";
-import { getArticleService } from "@service/article";
-import { headers } from "next/headers";
-import { formatDateTime } from "web-one";
+import BackButton from "@components/client"
+import { Error } from "@components/error"
+import { logger, toString } from "@lib/logger"
+import { getDateFormat, getLang, getResource } from "@resources"
+import { getArticleService } from "@service/article"
+import { headers } from "next/headers"
+import { formatDateTime } from "web-one"
 
-export default async function Article({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function Article({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const query = await searchParams
   const lang = getLang(query)
   const resource = getResource(lang)
-  const { slug } = await params
+  const { id } = await params
 
   const service = getArticleService()
   try {
-    const article = await service.load(slug)
+    const article = await service.load(id)
     if (!article) {
-      logger.warn(`Article not found: ${slug}`)
+      logger.warn(`Article not found: ${id}`)
       return <Error title={resource.error_404_title} message={resource.error_404_message} />
     }
     const dateFormat = getDateFormat(lang)

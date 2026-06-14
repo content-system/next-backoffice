@@ -1,18 +1,8 @@
 import { formatText } from "@components/client-script"
-import Input from "@components/form"
+import { Input } from "@components/form"
 import { email, getLang, getResource } from "@resources"
-import { Contact, contactModel, getContactService } from "@service/contact"
-import { redirect } from "next/navigation"
-import { validate } from "validation-core"
-import { formatPhone, fromFormData } from "web-one"
-
-export function printObject(obj: any): void {
-  const keys = Object.keys(obj)
-  for (const k of keys) {
-    const v = obj[k]
-    console.log("key " + k + ": " + v)
-  }
-}
+import { Contact } from "@service/contact"
+import { formatPhone } from "web-one"
 
 export default async function ContactForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const query = await searchParams
@@ -20,28 +10,9 @@ export default async function ContactForm({ searchParams }: { searchParams: Prom
   const resource = getResource(lang)
 
   const contact = {} as Contact
-  async function save(formData: FormData) {
-    "use server"
-    const obj = fromFormData<Contact>(formData, contactModel)
-    console.log("Print object " + JSON.stringify(obj))
-    printObject(obj)
-    const errors = validate<Contact>(obj, contactModel, resource)
-    if (errors.length > 0) {
-      console.log("Validation Error " + errors[0].message)
-      redirect("/works")
-    } else {
-      const service = getContactService()
-      const result = await service.submit(obj)
-      console.log("Result " + result)
-      if (result > 0) {
-        redirect("/news")
-      } else {
-        redirect("/leadership")
-      }
-    }
-  }
+
   return (
-    <form id="contactForm" name="contactForm" className="form" noValidate={true} action={save}>
+    <form id="contactForm" name="contactForm" className="form" noValidate={true}>
       <header>
         <h2>{resource.contact}</h2>
       </header>

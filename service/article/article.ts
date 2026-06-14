@@ -1,4 +1,4 @@
-import { Attributes, Filter, SearchResult, TimeRange } from "onecore"
+import { Attributes, Filter, SearchResult, TimeRange, Transaction } from "onecore"
 
 export interface Article {
   id: string
@@ -10,10 +10,18 @@ export interface Article {
   tags?: string[]
   thumbnail?: string
   highThumbnail?: string
-  status?: string
-  createdAt?: Date
   authorId?: string
-  savedAt?: Date
+  status?: string
+
+  submittedBy: string
+  submittedAt?: Date
+  approvedBy?: string
+  approvedAt?: Date
+
+  createdBy: string
+  createdAt?: Date
+  updatedBy: string
+  updatedAt?: Date
 }
 export interface ArticleFilter extends Filter {
   id?: string
@@ -28,22 +36,38 @@ export interface ArticleFilter extends Filter {
   isSaved?: boolean
 }
 
-export interface ArticleRepository {
+export interface DraftArticleRepository {
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>>
-  load(slug: string, userId?: string): Promise<Article | null>
+  load(id: string, tx?: Transaction): Promise<Article | null>
+  create(article: Article, tx: Transaction): Promise<number>
+  update(article: Article, tx: Transaction): Promise<number>
+  patch(article: Partial<Article>, tx: Transaction): Promise<number>
+  delete(id: string, tx?: Transaction): Promise<number>
+}
+export interface ArticleRepository {
+  exist(id: string, tx?: Transaction): Promise<boolean>
+  load(id: string, tx?: Transaction): Promise<Article | null>
+  save(article: Article, tx: Transaction): Promise<number>
 }
 export interface ArticleService {
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>>
-  load(slug: string, userId?: string): Promise<Article | null>
+  loadDraft(id: string): Promise<Article | null>
+  load(id: string): Promise<Article | null>
+  create(article: Article): Promise<number>
+  update(article: Article): Promise<number>
+  patch(article: Partial<Article>): Promise<number>
+  approve(id: string, approvedBy: string): Promise<number>
+  reject(id: string, rejectedBy: string): Promise<number>
+  delete(id: string): Promise<number>
 }
-
-export const Published = "P"
 
 export const articleModel: Attributes = {
   id: {
     key: true,
     length: 40,
-    required: true,
+  },
+  slug: {
+    length: 150,
   },
   title: {
     length: 255,
@@ -78,6 +102,24 @@ export const articleModel: Attributes = {
     length: 400,
     noupdate: true,
   },
+  status: {
+    length: 1,
+  },
+
+  submittedBy: {
+    column: "submitted_by",
+  },
+  submittedAt: {
+    column: "submitted_at",
+    type: "datetime",
+  },
+  approvedBy: {
+    column: "approved_by",
+  },
+  approvedAt: {
+    column: "approved_at",
+    type: "datetime",
+  },
 
   createdBy: {
     column: "created_by",
@@ -87,6 +129,7 @@ export const articleModel: Attributes = {
     column: "created_at",
     type: "datetime",
     noupdate: true,
+    createdAt: true,
   },
   updatedBy: {
     column: "updated_by",
@@ -94,11 +137,6 @@ export const articleModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-  },
-  savedAt: {
-    column: "saved_at",
-    type: "datetime",
-    noupdate: true,
-    noinsert: true,
+    updatedAt: true
   },
 }

@@ -1,16 +1,11 @@
 import { DB } from "onecore"
 import { param } from "pg-extension"
-import { buildSort, SearchRepository, Statement } from "sql-core"
+import { buildSort, Repository, Statement } from "sql-core"
 import { Job, JobFilter, jobModel, JobRepository } from "./job"
 
-export class SqlJobRepository extends SearchRepository<Job, JobFilter> implements JobRepository {
+export class SqlJobRepository extends Repository<Job, string, JobFilter> implements JobRepository {
   constructor(db: DB) {
     super(db, "jobs", jobModel, buildQuery)
-  }
-  async load(slug: string): Promise<Job | null> {
-    const query = `select * from jobs where slug = ${this.db.param(1)}`
-    const jobs = await this.db.query<Job>(query, [slug], this.map, this.bools)
-    return jobs && jobs.length > 0 ? jobs[0] : null
   }
 }
 

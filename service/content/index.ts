@@ -1,33 +1,26 @@
 import { db } from "@lib/db"
-import { DB } from "sql-core"
-import { Content, ContentRepository, ContentService } from "./content"
+import { SearchWriter } from "onecore"
+import { Content, ContentFilter, ContentRepository, ContentService } from "./content"
+import { SqlContentRepository } from "./repository"
 export * from "./content"
 
-export class SqlContentRepository implements ContentRepository {
-  constructor(protected db: DB) { }
-  async load(id: string, lang: string): Promise<Content | null> {
-    const sql = `select id, lang, body from contents where id = ${this.db.param(1)} and lang = ${this.db.param(2)}`
-    const contents = await this.db.query<Content>(sql, [id, lang])
-    return contents.length === 0 ? null : contents[0]
+export class ContentUseCase extends SearchWriter<Content, ContentFilter> implements ContentService {
+  constructor(protected repository: ContentRepository) {
+    super(repository)
+  }
+  load(id: string, lang: string): Promise<Content | null> {
+    return this.repository.load(id, lang)
+  }
+  delete(id: string, lang: string): Promise<number> {
+    return this.repository.delete(id, lang)
   }
 }
 
-export class ContentUseCase implements ContentService {
-  constructor(protected repository: ContentRepository) { }
-  async load(id: string, lang: string): Promise<Content | null> {
-    const content = await this.repository.load(id, lang)
-    if (!content) {
-      return this.repository.load(id, "en")
-    }
-    return content
-  }
-}
-
-let contentService: ContentService | undefined
+let service: ContentService | undefined
 export function getContentService(): ContentService {
-  if (!contentService) {
+  if (!service) {
     const repository = new SqlContentRepository(db)
-    contentService = new ContentUseCase(repository)
+    service = new ContentUseCase(repository)
   }
-  return contentService
+  return service
 }

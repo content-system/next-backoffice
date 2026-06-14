@@ -1,8 +1,7 @@
-
-import Link from "next/link";
-import { StringMap } from "onecore";
-import { ToggleMenu, ToggleUniversalSearch } from "./client";
-import { ToggleSidebar, ToggleTheme } from "./menu";
+import Link from "next/link"
+import { StringMap } from "onecore"
+import { ToggleMenu, ToggleUniversalSearch } from "./client"
+import { ToggleSidebar, ToggleTheme } from "./menu"
 
 export interface Props {
   resource: StringMap
@@ -15,8 +14,8 @@ export default async function PageHeader({ resource }: Props) {
         <div className="search-group">
           <section>
             <ToggleMenu className="toggle-menu" />
-            <ToggleUniversalSearch className="toggle-search"/>
-            <ToggleUniversalSearch className="close-search"/>
+            <ToggleUniversalSearch className="toggle-search" />
+            <ToggleUniversalSearch className="close-search" />
           </section>
           <div className="logo-wrapper">
             <img className="logo" src="../logo192.png" alt="Logo of The Company" />
@@ -30,9 +29,22 @@ export default async function PageHeader({ resource }: Props) {
             <div className="dropdown-menu-profile">
               <i className="material-icons">person</i>
               <ul id="dropdown-basic" className="dropdown-content-profile">
-                <ToggleSidebar className="menu" mode="menu" sidebarText={resource.sidebar} sidebarIcon="view_list" menuText={resource.menu} menuIcon="credit_card" />
+                <ToggleSidebar
+                  className="credit_card"
+                  mode="sidebar"
+                  sidebarText={resource.sidebar}
+                  sidebarIcon="view_list"
+                  menuText={resource.menu}
+                  menuIcon="credit_card"
+                />
                 <hr />
-                <ToggleTheme theme="light" darkText={resource.dark_mode} darkIcon="timelapse" lightText={resource.light_mode} lightIcon="radio_button_checked" />
+                <ToggleTheme
+                  theme="light"
+                  darkText={resource.dark_mode}
+                  darkIcon="timelapse"
+                  lightText={resource.light_mode}
+                  lightIcon="radio_button_checked"
+                />
                 <hr />
                 <li>
                   <i className="material-icons">account_circle</i>

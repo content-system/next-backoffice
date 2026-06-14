@@ -1,11 +1,11 @@
-import { enLocale, getLocale } from "locale-service"
+import { getLocale, usLocale } from "locale-service"
 import { StringMap } from "onecore"
 import { en as adminEN } from "./admin/en"
 import { vi as adminVI } from "./admin/vi"
 import { en as authenticationEN } from "./authentication/en"
 import { vi as authenticationVI } from "./authentication/vi"
-import { en as countryEN } from "./country/en"
-import { vi as countryVI } from "./country/vi"
+import { en as contentEN } from "./content/en"
+import { vi as contentVI } from "./content/vi"
 import { en as commonEN } from "./en"
 import { vi as commonVI } from "./vi"
 
@@ -53,13 +53,13 @@ const en: StringMap = {
   ...commonEN,
   ...authenticationEN,
   ...adminEN,
-  ...countryEN
+  ...contentEN
 }
 const vi: StringMap = {
   ...commonVI,
   ...authenticationVI,
   ...adminVI,
-  ...countryVI
+  ...contentVI
 }
 
 export const resources: Resources = {
@@ -69,9 +69,9 @@ export const resources: Resources = {
 
 export function getDateFormat(lang?: string): string {
   if (!lang) {
-    return enLocale.dateFormat
+    return usLocale.dateFormat
   }
-  const locale = getLocale(lang) || enLocale
+  const locale = getLocale(lang) || usLocale
   return locale.dateFormat
 }
 export function getDefaultLang(): string {

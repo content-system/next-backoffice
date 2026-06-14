@@ -42,7 +42,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
           <Form id="jobsForm" name="jobsForm" className="form" noValidate={true} action="/jobs">
             <section className="row search-group">
               <Search
-                className="col s12 m6 l4 xl6 search-input" 
+                className="col s12 m6 l4 xl6 search-input"
                 limit={filter.limit}
                 limits={limits}
                 limitSearch={limitSearch}
@@ -85,7 +85,9 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
             {list.map((item, i) => {
               return (
                 <li key={i} className="col s12 m6 l4 xl3 list-item">
-                  <Link href={`/jobs/${item.slug}${langSearch}`} prefetch={false}>{item.title}</Link>
+                  <Link href={`/jobs/${item.id}${langSearch}`} prefetch={false}>
+                    {item.title}
+                  </Link>
                   <p>
                     {item.location} {item.quantity}
                     <span>{formatDateTime(item.publishedAt, dateFormat)}</span>

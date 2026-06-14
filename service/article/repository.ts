@@ -1,51 +1,29 @@
-import { DB } from "onecore"
-import { param } from "pg-extension"
-import { buildSort, SearchRepository, Statement } from "sql-core"
-import { Article, ArticleFilter, articleModel, ArticleRepository } from "./article"
+import { DB, Transaction } from "onecore"
+import { buildToSave, param } from "pg-extension"
+import { buildSort, Repository, SqlViewRepository, Statement } from "sql-core"
+import { Article, ArticleFilter, articleModel, ArticleRepository, DraftArticleRepository } from "./article"
 
-export class SqlArticleRepository extends SearchRepository<Article, ArticleFilter> implements ArticleRepository {
+export class SqlDraftArticleRepository extends Repository<Article, string, ArticleFilter> implements DraftArticleRepository {
   constructor(db: DB) {
-    super(db, "articles", articleModel, buildQuery)
+    super(db, "draft_articles", articleModel, buildQuery)
   }
-  async load(slug: string, userId?: string): Promise<Article | null> {
-    const params = []
-    let query: string
-    if (userId) {
-      query = `select a.*, sa.saved_at 
-        from articles a 
-        left join saved_articles sa 
-          on sa.id = a.id and sa.user_id = ${this.db.param(1)} where a.slug = ${this.db.param(2)}`
-      params.push(userId)
-    } else {
-      query = `select a.* from articles a where a.slug = ${this.db.param(1)}`
-    }
-    params.push(slug)
-    const articles = await this.db.query<Article>(query, params, this.map)
-    return articles && articles.length > 0 ? articles[0] : null
+}
+export class SqlArticleRepository extends SqlViewRepository<Article, string> implements ArticleRepository {
+  constructor(protected db: DB) {
+    super(db, "articles", articleModel)
+  }
+  save(article: Article, tx?: Transaction): Promise<number> {
+    const stmt = buildToSave(article, "articles", articleModel)
+    const db = tx ? tx : this.db
+    return db.execute(stmt.query, stmt.params)
   }
 }
 
 export function buildQuery(filter: ArticleFilter): Statement {
+  let query = `select * from draft_articles `
   const where: string[] = []
   const params = []
   let i = 1
-  let query: string
-  if (filter.userId) {
-    if (filter.isSaved) {
-      query = `select a.id, a.thumbnail, a.slug, a.title, a.description, a.published_at, sa.saved_at 
-        from saved_articles sa 
-        inner join articles a
-        on sa.user_id = ${param(i++)} and sa.id = a.id`
-    } else {
-      query = `select a.id, a.thumbnail, a.slug, a.title, a.description, a.published_at, sa.saved_at 
-        from articles a 
-        left join saved_articles sa 
-        on sa.id = a.id and sa.user_id = ${param(i++)}`
-    }
-    params.push(filter.userId)
-  } else {
-    query = `select a.id, a.thumbnail, a.slug, a.title, a.description, a.published_at from articles a`
-  }
 
   if (filter.authorId) {
     params.push(filter.authorId)
@@ -69,8 +47,12 @@ export function buildQuery(filter: ArticleFilter): Statement {
   }
 
   if (filter.status && filter.status.length > 0) {
-    params.push(filter.status)
-    where.push(`status = ${param(i++)}`)
+    const arr: string[] = []
+    for (const status of filter.status) {
+      params.push(status)
+      arr.push(`${param(i++)}`)
+    }
+    where.push(`status in (${arr.join(",")})`)
   }
 
   if (filter.q) {

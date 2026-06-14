@@ -4,19 +4,19 @@ import Search from "@components/search"
 import { Item, Sort } from "@components/sort"
 import { logger, toString } from "@lib/logger"
 import { defaultLimit, getDateFormat, getLang, getLangSearch, getResource, isDefaultLang, limits, sort } from "@resources"
-import { getJobService, JobFilter } from "@service/job"
+import { ArticleFilter, getArticleService } from "@service/article"
 import Form from "next/form"
 import { headers } from "next/headers"
 import Link from "next/link"
 import { buildFilter, datetimeToString, formatDateTime, removeLimit, removePage, removeSort } from "web-one"
 
-export default async function Careers({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function News({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const query = await searchParams
   const lang = getLang(query)
   const resource = getResource(lang)
 
-  const filter = buildFilter<JobFilter>(query, defaultLimit, ["publishedAt"])
-  const service = getJobService()
+  const filter = buildFilter<ArticleFilter>(query, defaultLimit, ["publishedAt"])
+  const service = getArticleService()
   try {
     const { list, total } = await service.search(filter, filter.limit, filter.page)
 
@@ -39,10 +39,10 @@ export default async function Careers({ searchParams }: { searchParams: Promise<
           <h2>{resource.news}</h2>
         </header>
         <div className="main-body">
-          <Form id="jobsForm" name="jobsForm" className="form" noValidate={true} action="/careers">
+          <Form id="articlesForm" name="articlesForm" className="form" noValidate={true} action="/news">
             <section className="row search-group">
               <Search
-                className="col s12 m6 l4 xl6 search-input" 
+                className="col s12 m6 l4 xl6 search-input"
                 limit={filter.limit}
                 limits={limits}
                 limitSearch={limitSearch}
@@ -84,12 +84,15 @@ export default async function Careers({ searchParams }: { searchParams: Promise<
           <ul className="row list card-grid">
             {list.map((item, i) => {
               return (
-                <li key={i} className="col s12 m6 l4 xl3 list-item">
-                  <Link href={`/careers/${item.slug}${langSearch}`} prefetch={false}>{item.title}</Link>
-                  <p>
-                    {item.location} {item.quantity}
-                    <span>{formatDateTime(item.publishedAt, dateFormat)}</span>
-                  </p>
+                <li key={i} className="col s12 m6 l4 xl3 img-card">
+                  <section>
+                    <div className="cover" style={{ backgroundImage: `url('${item.thumbnail}')` }}></div>
+                    <Link href={`/articles/${item.id}${langSearch}`} prefetch={false}>
+                      {item.title}
+                    </Link>
+                    <p>{formatDateTime(item.publishedAt, dateFormat)}</p>
+                    <p>{item.description}</p>
+                  </section>
                 </li>
               )
             })}

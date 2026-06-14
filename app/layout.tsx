@@ -1,8 +1,8 @@
-import "@assets/css/globals.css";
-import LayoutPage from "@components/layout";
-import { getLangByPath } from "@resources";
-import { headers } from "next/headers";
-import Script from "next/script";
+import "@assets/css/globals.css"
+import LayoutPage from "@components/layout"
+import { getLangByPath } from "@resources"
+import { headers } from "next/headers"
+import Script from "next/script"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers()
@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="apple-touch-icon" href="../public/logo192.png" />
         <title>Next App</title>
       </head>
-      <body id="sysBody" className="full-header top-menu">
+      <body id="sysBody" className="full-header">
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="sysToast" className="toast-message alert-success"></div>
         <div id="sysLoading" className="loader-wrapper" style={{ display: "none" }}>

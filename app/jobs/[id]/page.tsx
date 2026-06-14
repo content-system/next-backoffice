@@ -1,27 +1,33 @@
-import BackButton from "@components/client";
-import { Error } from "@components/error";
-import { logger, toString } from "@lib/logger";
-import { getDateFormat, getLang, getResource } from "@resources";
-import { getJobService } from "@service/job";
-import { headers } from "next/headers";
-import { formatDateTime } from "web-one";
+import BackButton from "@components/client"
+import { Error } from "@components/error"
+import { logger, toString } from "@lib/logger"
+import { getDateFormat, getLang, getResource } from "@resources"
+import { getJobService } from "@service/job"
+import { headers } from "next/headers"
+import { formatDateTime } from "web-one"
 
-export default async function Job({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function Job({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const query = await searchParams
   const lang = getLang(query)
   const resource = getResource(lang)
-  const { slug } = await params
+  const { id } = await params
 
   const service = getJobService()
   try {
-    const job = await service.load(slug)
+    const job = await service.load(id)
     if (!job) {
-      logger.warn(`Job not found: ${slug}`)
+      logger.warn(`Job not found: ${id}`)
       return <Error title={resource.error_404_title} message={resource.error_404_message} />
     }
     const dateFormat = getDateFormat(lang)
     return (
-      <article className="article" >
+      <article className="article">
         <header>
           <BackButton id="backBtn" name="backBtn" className="btn-back" />
           <h2>{job.title}</h2>
@@ -36,7 +42,7 @@ export default async function Job({ params, searchParams }: { params: Promise<{ 
           </h4>
           <div className="job-description" dangerouslySetInnerHTML={{ __html: job.description }}></div>
         </div>
-      </article >
+      </article>
     )
   } catch (err) {
     const headerList = await headers()
