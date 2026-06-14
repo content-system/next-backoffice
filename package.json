@@ -1,0 +1,39 @@
+{
+  "name": "next-website",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "authen-service": "^0.4.4",
+    "bcryptjs": "^3.0.3",
+    "config-plus": "^0.0.4",
+    "jsonwebtoken": "^9.0.3",
+    "locale-service": "^0.2.2",
+    "logger-core": "^0.3.1",
+    "nanoid": "^3.3.4",
+    "next": "16.2.9",
+    "onecore": "^0.5.15",
+    "pg": "^8.21.0",
+    "pg-extension": "^0.3.8",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "sql-core": "^0.1.3",
+    "validation-core": "^1.1.0",
+    "web-one": "^0.0.10"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.9.3",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.2.9",
+    "typescript": "^6.0.3"
+  }
+}

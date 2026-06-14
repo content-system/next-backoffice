@@ -1,0 +1,69 @@
+@import "../fonts/Roboto/font.css";
+@import "../fonts/material-icon/css/material-icons.css";
+@import "./reset.css";
+@import "./checkbox.css";
+@import "./radio.css";
+@import "./grid.css";
+@import "./alert.css";
+@import "./loader.css";
+@import "./page.css";
+@import "./main.css";
+@import "./modal.css";
+@import "./multi-select.css";
+@import "./form.css";
+@import "./article.css";
+@import "./card.css";
+@import "./solid-container.css";
+@import "./table.css";
+@import "./list-detail.css";
+@import "./list-detail.css";
+@import "./data-list.css";
+@import "./button.css";
+@import "./search.css";
+@import "./layout.css";
+@import "./group.css";
+@import "./navigation.css";
+@import "./pagination.css";
+@import "./theme.css";
+@import "./dark.css";
+@import "./grey.css";
+@import "./grey-dark.css";
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
