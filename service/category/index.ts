@@ -1,14 +1,8 @@
 import { db } from "@lib/db";
-import { UseCase } from "onecore";
-import { Category, CategoryFilter, CategoryRepository, CategoryService } from "./category";
+import { CategoryService } from "./category";
 import { SqlCategoryRepository } from "./repository";
+import { CategoryUseCase } from "./service";
 export * from "./category";
-
-export class CategoryUseCase extends UseCase<Category, string, CategoryFilter> implements CategoryService {
-  constructor(repository: CategoryRepository) {
-    super(repository)
-  }
-}
 
 let service: CategoryService | undefined
 export function getCategoryService(): CategoryService {

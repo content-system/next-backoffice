@@ -1,4 +1,5 @@
 import { Attributes, Filter, SearchResult, TimeRange, Transaction } from "onecore"
+import { History } from "../shared/history"
 
 export interface Article {
   id: string
@@ -53,6 +54,7 @@ export interface ArticleService {
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>>
   loadDraft(id: string): Promise<Article | null>
   load(id: string): Promise<Article | null>
+  getHistories(id: string, limit: number, nextPageToken?: string): Promise<History<Article>[]>
   create(article: Article): Promise<number>
   update(article: Article): Promise<number>
   patch(article: Partial<Article>): Promise<number>
@@ -137,6 +139,6 @@ export const articleModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-    updatedAt: true
+    updatedAt: true,
   },
 }

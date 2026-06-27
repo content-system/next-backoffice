@@ -98,6 +98,6 @@ export const categoryModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-    updatedAt: true
+    updatedAt: true,
   },
 }
