@@ -25,7 +25,9 @@ export function Limit(props: Props) {
         {props.items &&
           props.items.map((item, i) => {
             return (
-              <SearchLink key={item.toString()} href={`${prefix}${field}=${item}`} parentClass={parentClass}>{item}</SearchLink>
+              <SearchLink key={item.toString()} href={`${prefix}${field}=${item}`} parentClass={parentClass}>
+                {item}
+              </SearchLink>
             )
           })}
       </div>

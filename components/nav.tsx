@@ -7,7 +7,7 @@ export interface Props {
   resource?: StringMap
 }
 export interface MenuItem {
-  id: string
+  id?: string
   name: string
   path: string
   resource?: string
@@ -26,16 +26,16 @@ export function Nav(props: Props) {
     <nav id="sysNav" className="expanded-all">
       <ul>
         <li>
-          <p className="sidebar-off-menu"><ToggleMenu className="toggle" /></p>
+          <p className="sidebar-off-menu">
+            <ToggleMenu className="toggle" />
+          </p>
         </li>
         {props.items.map((m) =>
           m.children && m.children.length > 0 ? (
             <li className="open" key={m.id}>
               <SubList>
                 <i className="material-icons">{m.icon}</i>
-                <span>
-                  {getName(m.name, m.resource, props.resource)}
-                </span>
+                <span>{getName(m.name, m.resource, props.resource)}</span>
                 <i className="entity-icon down"></i>
               </SubList>
               <ul className="sub-list expanded">
@@ -43,9 +43,7 @@ export function Nav(props: Props) {
                   <ClientNav key={s.path} href={s.path}>
                     <Link href={s.path} className="menu-item" prefetch={false}>
                       <i className="material-icons">{s.icon}</i>
-                      <span>
-                        {getName(s.name, s.resource, props.resource)}
-                      </span>
+                      <span>{getName(s.name, s.resource, props.resource)}</span>
                     </Link>
                   </ClientNav>
                 ))}
@@ -55,12 +53,10 @@ export function Nav(props: Props) {
             <ClientNav key={m.path} href={m.path}>
               <Link href={m.path} className="menu-item" prefetch={false}>
                 <i className="material-icons">{m.icon}</i>
-                <span>
-                  {getName(m.name, m.resource, props.resource)}
-                </span>
+                <span>{getName(m.name, m.resource, props.resource)}</span>
               </Link>
             </ClientNav>
-          )
+          ),
         )}
       </ul>
     </nav>

@@ -3,25 +3,24 @@ import { Pagination } from "@components/pagination"
 import Search from "@components/search"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { hasPermission } from "@lib/authorizor"
+import { logError, logForbidden } from "@lib/logger"
 import { defaultLimit, getResource, getStatusName, limits } from "@resources"
 import { ContentFilter, getContentService } from "@service/content"
 import Form from "next/form"
-import { headers } from "next/headers"
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { buildFilter, buildSortSearch, getOffset, removeLimit, removePage } from "web-one"
+import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage } from "web-one"
 
 const fields = ["id", "lang", "title", "publishedAt", "description", "status"]
 
 export default async function ContentsForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const headerList = await headers()
-  const pathname = headerList.get("x-current-path") as string
   const account = await getCurrentUser()
-  if (!account) {
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`)
-  }
   const resource = getResource(account?.language)
+  const canRead = await hasPermission(read)
+  if (!canRead) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
 
   const query = await searchParams
   const filter = buildFilter<ContentFilter>(query, defaultLimit)
@@ -98,7 +97,7 @@ export default async function ContentsForm({ searchParams }: { searchParams: Pro
       </div>
     )
   } catch (err) {
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

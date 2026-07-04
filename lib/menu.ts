@@ -1,5 +1,5 @@
-import { Category, toMenuItems } from 'web-one';
-import { db } from './db';
+import { Category, toMenuItems } from "web-one"
+import { db } from "./db"
 
 const sql = `
   select distinct m.module_id as id, m.module_name as name, m.resource_key as resource,
@@ -13,7 +13,6 @@ const sql = `
   order by sequence`
 
 export const getMenu = async (userId: string) => {
-  console.log('Fetching menu...');
   const categories = await db.query<Category>(sql, [userId])
   return toMenuItems(categories)
 }

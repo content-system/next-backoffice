@@ -30,7 +30,7 @@ export default async function PageHeader({ resource }: Props) {
               <i className="material-icons">person</i>
               <ul id="dropdown-basic" className="dropdown-content-profile">
                 <ToggleSidebar
-                  className="credit_card"
+                  className="menu"
                   mode="sidebar"
                   sidebarText={resource.sidebar}
                   sidebarIcon="view_list"

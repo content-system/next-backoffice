@@ -24,12 +24,13 @@ export interface Settings {
   dateFormat: string
 }
 export class SettingsService {
-  constructor(protected db: DB) { }
+  constructor(protected db: DB) {}
   save(settings: Settings): Promise<number> {
     const stmt = buildToUpdate(settings, "users", userModel, db.param)
     return this.db.execute(stmt.query, stmt.params)
   }
 }
+
 let service: SettingsService | undefined
 export function getSettingsService(): SettingsService {
   if (!service) {

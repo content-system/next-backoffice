@@ -6,7 +6,7 @@ import Script from "next/script"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers()
-  const pathname = headerList.get("x-current-path")
+  const pathname = headerList.get("x-current-fullpath")
   const language = headerList.get("x-language")
   const lang = language ? language : getLangByPath(pathname)
   return (

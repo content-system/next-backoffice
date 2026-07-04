@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { MouseEvent, ReactNode } from "react";
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { MouseEvent, ReactNode } from "react"
 
 export function ClientLayout({ nav, header, children }: { nav: ReactNode; header: ReactNode; children: ReactNode }) {
   const pathname = usePathname()
@@ -26,34 +26,51 @@ export function ClientLayout({ nav, header, children }: { nav: ReactNode; header
 }
 
 export function RelativeLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname && pathname.startsWith(href);
+  const pathname = usePathname()
+  const isActive = pathname && pathname.startsWith(href)
   if (className) {
-    return <Link href={href} prefetch={false} className={isActive ? className + " active" : className} >{children}</Link>
+    return (
+      <Link href={href} prefetch={false} className={isActive ? className + " active" : className}>
+        {children}
+      </Link>
+    )
   } else {
-    return <Link href={href} prefetch={false} className={isActive ? "active" : ""} >{children}</Link>
+    return (
+      <Link href={href} prefetch={false} className={isActive ? "active" : ""}>
+        {children}
+      </Link>
+    )
   }
 }
 export function ClientLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
+  const pathname = usePathname()
+  const isActive = pathname === href
   if (className) {
-    return <Link href={href} prefetch={false} className={isActive ? className + " active" : className}>{children}</Link>
+    return (
+      <Link href={href} prefetch={false} className={isActive ? className + " active" : className}>
+        {children}
+      </Link>
+    )
   } else {
-    return <Link href={href} prefetch={false} className={isActive ? "active" : ""} > {children} </Link>
+    return (
+      <Link href={href} prefetch={false} className={isActive ? "active" : ""}>
+        {" "}
+        {children}{" "}
+      </Link>
+    )
   }
 }
 export function ClientNav({ href, children }: { href: string; children: ReactNode }) {
   const pathname = usePathname()
   const isActive = pathname === href
-  return (
-    <li className={isActive ? "active" : ""}>{children}</li>
-  )
+  return <li className={isActive ? "active" : ""}>{children}</li>
 }
 
 export function SubList({ children }: { children: ReactNode }) {
   return (
-    <div className="menu-item" onClick={e => toggleMenuItem(e.target as HTMLElement)}>{children}</div>
+    <div className="menu-item" onClick={(e) => toggleMenuItem(e.target as HTMLElement)}>
+      {children}
+    </div>
   )
 }
 function toggleMenuItem(target: HTMLElement) {
@@ -159,18 +176,20 @@ function findParent(e: HTMLElement | null | undefined, className: string): HTMLE
 }
 
 interface Props {
+  type?: "button" | "submit" | "reset"
   id?: string
   name?: string
   className?: string
   children?: ReactNode
 }
-export default function BackButton({ id, name, className, children }: Props) {
-  const router = useRouter();
+export function BackButton({ type, id, name, className, children }: Props) {
+  const router = useRouter()
+  const t = type || "button"
   return (
-    <button type="button" id={id} name={name} className={className} onClick={() => router.back()}>
+    <button type={t} id={id} name={name} className={className} onClick={() => router.back()}>
       {children}
     </button>
-  );
+  )
 }
 export function ToggleDropdown({ id, name, className, children }: Props) {
   const onClick = (e: MouseEvent<HTMLButtonElement>) => {

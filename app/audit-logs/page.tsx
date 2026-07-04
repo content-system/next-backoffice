@@ -4,25 +4,23 @@ import { Limit } from "@components/limit"
 import { Pagination } from "@components/pagination"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { hasPermission } from "@lib/authorizor"
+import { logError, logForbidden } from "@lib/logger"
 import { defaultLimit, getDateFormat, getResource, limits } from "@resources"
 import { AuditLogFilter, getAuditLogService } from "@service/audit-log"
 import Form from "next/form"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
-import { buildFilter, buildSortSearch, datetimeToString, formatFullDateTime, getOffset, removeLimit, removePage } from "web-one"
+import { buildFilter, buildSortSearch, datetimeToString, formatFullDateTime, getOffset, read, removeLimit, removePage } from "web-one"
 
 const fields = ["id", "time", "resource", "action", "status", "userId", "ip", "remark"]
 
 export default async function AuditLogsForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const headerList = await headers()
-  const pathname = headerList.get("x-current-path") as string
   const account = await getCurrentUser()
-  if (!account) {
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`)
-  }
   const resource = getResource(account?.language)
-  const dateFormat = getDateFormat(account?.language)
+  const canRead = await hasPermission(read)
+  if (!canRead) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
 
   const query = await searchParams
   const filter = buildFilter<AuditLogFilter>(query, defaultLimit)
@@ -35,6 +33,8 @@ export default async function AuditLogsForm({ searchParams }: { searchParams: Pr
     const sort = buildSortSearch(query, fields, filter.sort)
     const offset = getOffset(filter.limit, filter.page)
 
+    const dateFormat = getDateFormat(account?.language, account?.dateFormat)
+
     return (
       <div>
         <header>
@@ -45,35 +45,15 @@ export default async function AuditLogsForm({ searchParams }: { searchParams: Pr
             <section className="row section">
               <label className="col s12 m2 l4">
                 {resource.action}
-                <Input
-                  type="text"
-                  id="action"
-                  name="action"
-                  defaultValue={filter.action}
-                  maxLength={40}
-                />
+                <Input type="text" id="action" name="action" defaultValue={filter.action} maxLength={40} />
               </label>
               <label className="col s12 m5 l4">
                 {resource.audit_log_time_from}
-                <Input
-                  type="datetime-local"
-                  step=".010"
-                  id="time_min"
-                  name="time.min"
-                  data-field="time.min"
-                  value={datetimeToString(filter.time?.min)}
-                />
+                <Input type="datetime-local" step=".010" id="time_min" name="time.min" data-field="time.min" value={datetimeToString(filter.time?.min)} />
               </label>
               <label className="col s12 m5 l4">
                 {resource.audit_log_time_to}
-                <Input
-                  type="datetime-local"
-                  step=".010"
-                  id="time_max"
-                  name="time.min"
-                  data-field="time.max"
-                  value={datetimeToString(filter.time?.max)}
-                />
+                <Input type="datetime-local" step=".010" id="time_max" name="time.min" data-field="time.max" value={datetimeToString(filter.time?.max)} />
               </label>
             </section>
             <section className="section search">
@@ -81,7 +61,9 @@ export default async function AuditLogsForm({ searchParams }: { searchParams: Pr
                 {resource.page_size}
                 <Limit id="limitBtn" className="limit" text={filter.limit} search={limitSearch} items={limits} dropDownId="limitDropdown" />
               </label>
-              <button type="submit" id="searchBtn" className="btn-search">{resource.search}</button>
+              <button type="submit" id="searchBtn" className="btn-search">
+                {resource.search}
+              </button>
             </section>
           </Form>
           <form className="list-result">
@@ -137,7 +119,7 @@ export default async function AuditLogsForm({ searchParams }: { searchParams: Pr
       </div>
     )
   } catch (err) {
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

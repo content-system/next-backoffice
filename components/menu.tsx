@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { MouseEvent } from "react"
 
@@ -21,7 +21,8 @@ export function ToggleTheme({ id, theme, className, darkText, darkIcon, lightTex
   const icon = theme === "dark" ? lightIcon : darkIcon
   return (
     <li id={id} className={className} onClick={onClick}>
-      <i className="material-icons">{icon}</i><span>{text}</span>
+      <i className="material-icons">{icon}</i>
+      <span>{text}</span>
     </li>
   )
 }
@@ -47,7 +48,6 @@ function toggleTheme(ele: HTMLElement, darkText: string, darkIcon: string, light
         }
       }
     }
-    
   }
 }
 
@@ -70,7 +70,8 @@ export function ToggleSidebar({ id, mode, className, sidebarText, sidebarIcon, m
   const icon = mode === "sidebar" ? menuIcon : sidebarIcon
   return (
     <li id={id} className={className} onClick={onClick}>
-      <i className="material-icons">{icon}</i><span>{text}</span>
+      <i className="material-icons">{icon}</i>
+      <span>{text}</span>
     </li>
   )
 }

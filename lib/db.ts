@@ -8,12 +8,10 @@ export const globalForDB = globalThis as unknown as {
   db?: DB
 }
 export function createPool(): Pool {
-  console.log("enter create Pool")
   const dbURL = process.env.DB_URL || config.db.url
   return new Pool({ connectionString: dbURL, max: config.db.max })
 }
 export function createDB(): DB {
-  console.log("enter create DB")
   const dbURL = process.env.DB_URL || config.db.url
   return new PoolManager(new Pool({ connectionString: dbURL, max: config.db.max }))
 }

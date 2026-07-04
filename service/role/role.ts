@@ -46,6 +46,7 @@ export const roleModel: Attributes = {
     key: true,
     length: 40,
     q: true,
+    resource: "role_id",
   },
   roleName: {
     column: "role_name",
@@ -53,14 +54,17 @@ export const roleModel: Attributes = {
     length: 255,
     q: true,
     operator: "like",
+    resource: "role_name",
   },
   status: {
     length: 1,
-    operator: "="
+    operator: "=",
+    resource: "status",
   },
   remark: {
     length: 255,
     q: true,
+    resource: "remark",
   },
 
   createdBy: {
@@ -79,7 +83,7 @@ export const roleModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-    updatedAt: true
+    updatedAt: true,
   },
 
   privileges: {

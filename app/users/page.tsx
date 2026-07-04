@@ -3,26 +3,24 @@ import { Pagination } from "@components/pagination"
 import Search from "@components/search"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { hasPermission } from "@lib/authorizor"
+import { logError, logForbidden } from "@lib/logger"
 import { defaultLimit, getResource, getStatusName, limits } from "@resources"
 import { getUserService, UserFilter } from "@service/user"
 import Form from "next/form"
-import { headers } from "next/headers"
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { buildFilter, buildSortSearch, getOffset, removeLimit, removePage } from "web-one"
+import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage } from "web-one"
 
 const fields = ["userId", "username", "email", "displayName", "status"]
 
 export default async function UsersForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const headerList = await headers()
-  const pathname = headerList.get("x-current-path") as string
-  console.log("path " + pathname)
   const account = await getCurrentUser()
-  if (!account) {
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`)
-  }
   const resource = getResource(account?.language)
+  const canRead = await hasPermission(read)
+  if (!canRead) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
 
   const query = await searchParams
   const filter = buildFilter<UserFilter>(query, defaultLimit)
@@ -59,13 +57,7 @@ export default async function UsersForm({ searchParams }: { searchParams: Promis
             <section className="row search-group advance-search inline" hidden>
               <label className="col s12 m6">
                 {resource.email}
-                <input
-                  type="text"
-                  id="email"
-                  name="email"
-                  maxLength={80}
-                  defaultValue={filter.email}
-                />
+                <input type="text" id="email" name="email" maxLength={80} defaultValue={filter.email} />
               </label>
             </section>
           </Form>
@@ -98,7 +90,9 @@ export default async function UsersForm({ searchParams }: { searchParams: Promis
                       <td className="text-right">{offset + i + 1}</td>
                       <td>{user.userId}</td>
                       <td>
-                        <Link href={`/users/${user.userId}`} prefetch={false}>{user.username}</Link>
+                        <Link href={`/users/${user.userId}`} prefetch={false}>
+                          {user.username}
+                        </Link>
                       </td>
                       <td>{user.email}</td>
                       <td>{user.displayName}</td>
@@ -113,7 +107,7 @@ export default async function UsersForm({ searchParams }: { searchParams: Promis
       </div>
     )
   } catch (err) {
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

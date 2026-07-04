@@ -112,7 +112,11 @@ export function Pagination(props: Props) {
               </li>
             )) || (
               <li className={"page-item" + (p == page ? " active" : "")} key={i}>
-                {p != page && <Link className="page-link" href={getSearch(search, p)} prefetch={false}>{p}</Link>}
+                {p != page && (
+                  <Link className="page-link" href={getSearch(search, p)} prefetch={false}>
+                    {p}
+                  </Link>
+                )}
                 {p == page && <span className="page-link">{p}</span>}
               </li>
             ),

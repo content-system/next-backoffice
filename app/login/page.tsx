@@ -7,5 +7,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const lang = getLang(query)
   const redirect = getRecordValue(query.redirect)
   const resource = getResource(lang)
-  return <LoginForm lang={lang} resource={resource} redirect={redirect}/>
+  return <LoginForm lang={lang} resource={resource} redirect={redirect} />
 }

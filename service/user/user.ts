@@ -56,35 +56,41 @@ export const userModel: Attributes = {
     column: "user_id",
     key: true,
     length: 40,
-    operator: "="
+    operator: "=",
   },
   username: {
     required: true,
     length: 255,
     q: true,
+    resource: "username",
   },
   email: {
     format: "email",
     required: true,
     length: 120,
     q: true,
+    resource: "email",
   },
   displayName: {
     column: "display_name",
     length: 120,
     q: true,
+    resource: "display_name",
   },
   status: {
     length: 1,
-    operator: "="
+    operator: "=",
+    resource: "status",
   },
   gender: {
     length: 1,
+    resource: "gender",
   },
   phone: {
     format: "phone",
     required: true,
     length: 14,
+    resource: "phone",
   },
   title: {
     length: 10,
@@ -113,7 +119,7 @@ export const userModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-    updatedAt: true
+    updatedAt: true,
   },
 
   roles: {

@@ -1,5 +1,6 @@
 import { getLocale, usLocale } from "locale-service"
 import { StringMap } from "onecore"
+import { getRecordValue } from "web-one"
 import { en as adminEN } from "./admin/en"
 import { vi as adminVI } from "./admin/vi"
 import { en as authenticationEN } from "./authentication/en"
@@ -67,7 +68,10 @@ export const resources: Resources = {
   vi: vi,
 }
 
-export function getDateFormat(lang?: string): string {
+export function getDateFormat(lang?: string, dateFormat?: string): string {
+  if (dateFormat) {
+    return dateFormat
+  }
   if (!lang) {
     return usLocale.dateFormat
   }
@@ -96,32 +100,7 @@ export function getLangByPath(path?: string | null): string {
   }
   return path === "/vi" || path.startsWith("/vi/") ? "vi" : "en"
 }
-export function getLang(record?: Record<string, string | string[] | undefined> | string): string {
-  if (!record) {
-    return getLangByString()
-  } else if (typeof record === "string") {
-    return getLangByString(record)
-  } else {
-    const x = record["lang"]
-    if (!x) {
-      return "en"
-    }
-    if (Array.isArray(x)) {
-      if (x.length > 0) {
-        return getLangByString(x[x.length - 1])
-      } else {
-        return "en"
-      }
-    }
-    return getLangByString(x)
-  }
-}
-function getLangByString(s?: string | null): string {
-  if (!s) {
-    return "en"
-  }
-  if (s !== "vi") {
-    return "en"
-  }
-  return s
+export function getLang(record: Record<string, string | string[] | undefined>): string {
+  const lang = getRecordValue(record.lang)
+  return lang ? lang : "en"
 }

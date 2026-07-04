@@ -31,7 +31,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
       username: obj.username,
       lang: prevState.lang,
       redirect: prevState.redirect,
-      nextUrl: "/login"
+      nextUrl: "/login",
     }
   }
 
@@ -59,7 +59,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
         dateFormat: account.dateFormat,
       },
       process.env.TOKEN_SECRET || config.token.secret,
-      { expiresIn: config.token.expires }
+      { expiresIn: config.token.expires },
     )
 
     cookieStore.set("token", token, { httpOnly: true, path: "/" })
@@ -83,6 +83,6 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
     username: obj.username,
     lang: prevState.lang,
     redirect: prevState.redirect,
-    nextUrl
+    nextUrl,
   }
 }

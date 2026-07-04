@@ -30,9 +30,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json(res, { status })
   } catch (err) {
     logger.error(`Error at PUT /users: ${toString(err)}`)
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
   }
 }

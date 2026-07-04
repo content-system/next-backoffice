@@ -1,21 +1,22 @@
+import { BackButton } from "@components/client"
 import { formatText } from "@components/client-script"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { authorize, hasPrivilege } from "@lib/authorizor"
+import { logError, logForbidden, logger } from "@lib/logger"
 import { getResource, Status } from "@resources"
 import { getRoleService } from "@service/role"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { read } from "web-one"
 
 export default async function RoleForm({ params }: { params: Promise<{ id: string }> }) {
-  const headerList = await headers()
-  const pathname = headerList.get("x-current-path") as string
   const account = await getCurrentUser()
-  if (!account) {
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`)
-  }
   const resource = getResource(account?.language)
+  const permission = await authorize(1)
+  if (!hasPrivilege(permission, read)) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
 
   const { id } = await params
   const service = getRoleService()
@@ -26,9 +27,10 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
       return <Error title={resource.error_404_title} message={resource.error_404_message} />
     }
     return (
-      <form id="currencyForm" name="currencyForm" className="form" noValidate={true}>
+      <form id="roleForm" name="roleForm" className="form" noValidate={true} data-required-error={resource.error_required}>
         <header>
-          <h2>{resource.currency}</h2>
+          <BackButton id="backBtn" name="backBtn" className="btn-back" />
+          <h2>{resource.role}</h2>
         </header>
         <div className="row">
           <label className="col s12 m6 required">
@@ -59,14 +61,7 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
           </label>
           <label className="col s12 m6">
             {resource.remark}
-            <Input
-              type="text"
-              id="remark"
-              name="remark"
-              defaultValue={role.remark}
-              maxLength={120}
-              placeholder={resource.email}
-            />
+            <Input type="text" id="remark" name="remark" defaultValue={role.remark} maxLength={120} placeholder={resource.email} />
           </label>
           <label className="col s12 m6">
             {resource.status}
@@ -90,7 +85,7 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
       </form>
     )
   } catch (err) {
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

@@ -44,7 +44,9 @@ export function Sort(props: Props) {
         {props.items &&
           props.items.map((item, i) => {
             return (
-              <SearchLink key={item.value} id={item.id} href={item.value} parentClass={parentClass}>{item.text}</SearchLink>
+              <SearchLink key={item.value} id={item.id} href={item.value} parentClass={parentClass}>
+                {item.text}
+              </SearchLink>
             )
           })}
       </div>

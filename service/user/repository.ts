@@ -10,8 +10,8 @@ export function buildQuery(filter: UserFilter): Statement {
   let i = 1
 
   if (filter.userId) {
-    where.push(`id = $${param(i++)}`);
-    params.push(filter.userId);
+    where.push(`id = $${param(i++)}`)
+    params.push(filter.userId)
   }
 
   if (filter.status && filter.status.length > 0) {
@@ -33,16 +33,16 @@ export function buildQuery(filter: UserFilter): Statement {
   }
 
   if (filter.email) {
-    where.push(`email ilike ${param(i++)}`);
-    params.push(`${filter.email}%`);
+    where.push(`email ilike ${param(i++)}`)
+    params.push(`${filter.email}%`)
   }
   if (filter.username) {
-    where.push(`username ilike ${param(i++)}`);
-    params.push(`${filter.username}%`);
+    where.push(`username ilike ${param(i++)}`)
+    params.push(`${filter.username}%`)
   }
   if (filter.displayName) {
-    where.push(`display_name ilike ${param(i++)}`);
-    params.push(`%${filter.displayName}%`);
+    where.push(`display_name ilike ${param(i++)}`)
+    params.push(`%${filter.displayName}%`)
   }
 
   if (filter.q) {
@@ -62,7 +62,6 @@ export function buildQuery(filter: UserFilter): Statement {
     query = query + ` order by ${orderBy}`
   }
 
-  console.log(query)
   return { query, params }
 }
 

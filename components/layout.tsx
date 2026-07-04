@@ -1,10 +1,10 @@
-import { Nav } from "@components/nav";
-import { getCurrentUser } from "@lib/account";
-import { getMenu } from "@lib/menu";
-import { getResource } from "@resources";
-import { MenuItem } from "web-one";
-import { ClientLayout } from "./client";
-import PageHeader from "./page-header";
+import { Nav } from "@components/nav"
+import { getCurrentUser } from "@lib/account"
+import { getMenu } from "@lib/menu"
+import { getResource } from "@resources"
+import { MenuItem } from "web-one"
+import { ClientLayout } from "./client"
+import PageHeader from "./page-header"
 
 export default async function LayoutPage({ lang, children }: { lang: string; children: React.ReactNode }) {
   const resource = getResource(lang)

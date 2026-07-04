@@ -2,26 +2,31 @@ import { Error } from "@components/error"
 import { Pagination } from "@components/pagination"
 import Search from "@components/search"
 import { Item, Sort } from "@components/sort"
-import { logger, toString } from "@lib/logger"
-import { defaultLimit, getDateFormat, getLang, getLangSearch, getResource, isDefaultLang, limits, sort } from "@resources"
+import { getCurrentUser } from "@lib/account"
+import { hasPermission } from "@lib/authorizor"
+import { logForbidden, logger, toString } from "@lib/logger"
+import { defaultLimit, getDateFormat, getResource, limits, sort } from "@resources"
 import { getJobService, JobFilter } from "@service/job"
 import Form from "next/form"
 import { headers } from "next/headers"
 import Link from "next/link"
-import { buildFilter, datetimeToString, formatDateTime, removeLimit, removePage, removeSort } from "web-one"
+import { buildFilter, datetimeToString, formatDateTime, read, removeLimit, removePage, removeSort } from "web-one"
 
 export default async function Jobs({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const account = await getCurrentUser()
+  const resource = getResource(account?.language)
+  const canRead = await hasPermission(read)
+  if (!canRead) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
+
   const query = await searchParams
-  const lang = getLang(query)
-  const resource = getResource(lang)
 
   const filter = buildFilter<JobFilter>(query, defaultLimit, ["publishedAt"])
   const service = getJobService()
   try {
     const { list, total } = await service.search(filter, filter.limit, filter.page)
-
-    const dateFormat = getDateFormat(lang)
-    const langSearch = getLangSearch(lang)
 
     const search = removePage(query)
     const limitSearch = removeLimit(query)
@@ -32,6 +37,8 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
     const sort2: Item = { id: "timeAscSort", value: `${prefix}${sort}=publishedAt`, text: resource.sort_time_asc }
     const sortText = filter.sort == "publishedAt" ? resource.sort_desc_time_asc : resource.sort_desc_time_desc
     const items = [sort1, sort2]
+
+    const dateFormat = getDateFormat(account?.language, account?.dateFormat)
 
     return (
       <div>
@@ -79,13 +86,12 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
                 />
               </label>
             </section>
-            {!isDefaultLang(lang) && <input type="hidden" id="lang" name="lang" value={lang} />}
           </Form>
           <ul className="row list card-grid">
             {list.map((item, i) => {
               return (
                 <li key={i} className="col s12 m6 l4 xl3 list-item">
-                  <Link href={`/jobs/${item.id}${langSearch}`} prefetch={false}>
+                  <Link href={`/jobs/${item.id}`} prefetch={false}>
                     {item.title}
                   </Link>
                   <p>

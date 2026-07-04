@@ -1,4 +1,3 @@
-
 import { getCurrentUser } from "@lib/account"
 import { logger, toString } from "@lib/logger"
 import { getResource } from "@resources"

@@ -19,7 +19,7 @@ export default function LoginForm({ lang, resource, redirect }: Props) {
     success: false,
     lang,
     nextUrl: "/login",
-    redirect
+    redirect,
   }
   const [state, formAction, pending] = useActionState(loginAction, initialState)
 
@@ -35,24 +35,14 @@ export default function LoginForm({ lang, resource, redirect }: Props) {
         <div className="view-body row">
           <img className="logo" src="/logo192.png" alt="logo" />
           <h1>{resource.signin}</h1>
-          {state.message && (<div className="message alert-error">{state.message}</div>)}
+          {state.message && <div className="message alert-error">{state.message}</div>}
           <label className="col s12">
             {resource.username}
-            <input
-              name="username"
-              defaultValue={state.username}
-              maxLength={100}
-              placeholder={resource.placeholder_username}
-            />
+            <input name="username" defaultValue={state.username} maxLength={100} placeholder={resource.placeholder_username} />
           </label>
           <label className="col s12">
             {resource.password}
-            <input
-              type="password"
-              name="password"
-              maxLength={100}
-              placeholder={resource.placeholder_password}
-            />
+            <input type="password" name="password" maxLength={100} placeholder={resource.placeholder_password} />
           </label>
           <label className="col s12 checkbox-container">
             <input type="checkbox" name="remember" />

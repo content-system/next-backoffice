@@ -54,7 +54,7 @@ const authConfig = {
       inner join role_modules rm on r.role_id = rm.role_id
       inner join modules m on rm.module_id = m.module_id
     where u.user_id = $1 and r.status = 'A' and m.status = 'A'
-    order by sequence`
+    order by sequence`,
 }
 
 const map = {
@@ -74,7 +74,15 @@ export function getAuthenticator(): Authenticator<User, string> {
     const status = initializeStatus(authConfig.status)
     const userRepository = useUserRepository<string, SqlAuthTemplateConfig>(db, authConfig, map)
     const privilegeRepository = new PrivilegeRepository(db.query, authConfig.privileges)
-    authenticator = new Authenticator(status, compare, authConfig.account, userRepository, privilegeRepository.privileges, authConfig.lockedMinutes, authConfig.maxPasswordFailed)
+    authenticator = new Authenticator(
+      status,
+      compare,
+      authConfig.account,
+      userRepository,
+      privilegeRepository.privileges,
+      authConfig.lockedMinutes,
+      authConfig.maxPasswordFailed,
+    )
   }
   return authenticator
 }
