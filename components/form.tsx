@@ -1,6 +1,6 @@
 "use client"
 
-import { FocusEvent, FocusEventHandler, MouseEvent, ReactNode } from "react"
+import { FocusEvent, FocusEventHandler, KeyboardEvent, MouseEvent, ReactNode } from "react"
 import {
   addClass,
   addErrorMessage,
@@ -8,6 +8,7 @@ import {
   checkMax,
   checkMin,
   decode,
+  digitOnKeyDown as digitKeyDown,
   formatInteger,
   formatNumber,
   formatText,
@@ -18,10 +19,12 @@ import {
   getIntegerError,
   getLabel,
   getRequiredError,
+  integerOnKeyDown as integerKeyDown,
   isValidPattern,
   normalizeInteger,
   normalizeNumber,
   normalizePhone,
+  numberOnKeyDown as numberKeyDown,
   removeClasses,
   removeError,
   removeSeparators,
@@ -105,6 +108,7 @@ interface Props {
   children?: ReactNode
   onFocus?: FocusEventHandler<HTMLInputElement>
   onBlur?: FocusEventHandler<HTMLInputElement>
+  onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void
 }
 export function Input({
   type,
@@ -127,9 +131,11 @@ export function Input({
   children,
   onBlur,
   onFocus,
+  onKeyDown,
 }: Props) {
   const onFocusFn = onFocus ? onFocus : materialOnFocus
   const onBlurFn = onBlur ? onBlur : (e: FocusEvent<HTMLInputElement>) => checkOnBlur(e, required, requiredError, pattern, error)
+  const onKeyDownFn = onKeyDown ? onKeyDown : (e: KeyboardEvent<HTMLInputElement>) => { }
   return (
     <input
       type={type}
@@ -151,10 +157,27 @@ export function Input({
       placeholder={placeholder}
       onFocus={onFocusFn}
       onBlur={onBlurFn}
+      onKeyDown={onKeyDownFn}
     >
       {children}
     </input>
   )
+}
+
+export function digitOnKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  if (!digitKeyDown(e.nativeEvent)) {
+    e.preventDefault()
+  }
+}
+export function integerOnKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  if (!integerKeyDown(e.nativeEvent)) {
+    e.preventDefault()
+  }
+}
+export function numberOnKeyDown(e: KeyboardEvent<HTMLInputElement>, decimalSeparator?: "." | "," | "٫") {
+  if (!numberKeyDown(e.nativeEvent, decimalSeparator)) {
+    e.preventDefault()
+  }
 }
 
 export function checkOnBlur(e: FocusEvent<HTMLInputElement>, required?: boolean, requiredError?: string, patern?: string, paternError?: string) {
@@ -312,7 +335,7 @@ export function phoneOnFocus(e: FocusEvent<HTMLInputElement>) {
     e.target.value = v
   }
 }
-export function phoneOnBlur(e: FocusEvent<HTMLInputElement>) {}
+export function phoneOnBlur(e: FocusEvent<HTMLInputElement>) { }
 export function inputOnFocus(e: FocusEvent<HTMLInputElement>) {
   removeError(e.target)
 }

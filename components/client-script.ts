@@ -85,9 +85,9 @@ export function integerOnKeyDown(e: KeyboardEvent): boolean {
  *   -123.45
  *   -123,45
  *   -123٫45 (Arabic decimal separator)
- * depending on getDecimalSeparator()
+ * depending on decimalSeparator
  */
-export function numberOnKeyDown(e: KeyboardEvent, getDecimalSeparator: (input: HTMLInputElement) => string): boolean {
+export function numberOnKeyDown(e: KeyboardEvent, decimalSeparator?: "." | "," | "٫"): boolean {
   if (detectShortcut(e)) {
     return true
   }
@@ -109,8 +109,10 @@ export function numberOnKeyDown(e: KeyboardEvent, getDecimalSeparator: (input: H
   }
 
   if (key === "." || key === "," || key === "٫") {
-    const separator = getDecimalSeparator(input)
-    return key === separator && !input.value.includes(separator)
+    if (!decimalSeparator) {
+      decimalSeparator = "."
+    }
+    return key === decimalSeparator && !input.value.includes(decimalSeparator)
   }
 
   return isDigit(key)
