@@ -40,7 +40,7 @@ function isControlKey(key: string): boolean {
  * Allow:
  *   0-9
  */
-export function digitOnKeyDown(e: KeyboardEvent): boolean {
+export function digitKeyDown(e: KeyboardEvent): boolean {
   if (detectShortcut(e)) {
     return true
   }
@@ -57,7 +57,7 @@ export function digitOnKeyDown(e: KeyboardEvent): boolean {
  *   -123
  *   123
  */
-export function integerOnKeyDown(e: KeyboardEvent): boolean {
+export function integerKeyDown(e: KeyboardEvent): boolean {
   if (detectShortcut(e)) {
     return true
   }
@@ -87,7 +87,7 @@ export function integerOnKeyDown(e: KeyboardEvent): boolean {
  *   -123٫45 (Arabic decimal separator)
  * depending on decimalSeparator
  */
-export function numberOnKeyDown(e: KeyboardEvent, decimalSeparator?: "." | "," | "٫"): boolean {
+export function numberKeyDown(e: KeyboardEvent, decimalSeparator?: "." | "," | "٫"): boolean {
   if (detectShortcut(e)) {
     return true
   }

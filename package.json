@@ -22,7 +22,7 @@
     "pg-extension": "^0.3.8",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sql-core": "^0.1.4",
+    "sql-core": "^0.1.5",
     "validation-core": "^1.1.1",
     "web-one": "^0.0.14"
   },
