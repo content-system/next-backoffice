@@ -82,12 +82,14 @@ export default async function ArticleForm({
             width: "100%",
           }}
         >
+          {/* Back bên trái */}
           <BackButton
             id="backBtn"
             name="backBtn"
             className="btn-back"
           />
 
+          {/* Tiêu đề */}
           <h2
             style={{
               margin: 0,
@@ -97,7 +99,14 @@ export default async function ArticleForm({
             {resource.article}
           </h2>
 
-          <DeleteButton id={article.id} />
+          {/* Delete sát bên phải */}
+          <div
+            style={{
+              marginLeft: "auto",
+            }}
+          >
+            <DeleteButton id={article.id} />
+          </div>
         </header>
 
         {/* FORM */}
@@ -218,8 +227,8 @@ export default async function ArticleForm({
               defaultValue={
                 article.publishedAt
                   ? new Date(article.publishedAt)
-                    .toISOString()
-                    .substring(0, 16)
+                      .toISOString()
+                      .substring(0, 16)
                   : ""
               }
             />

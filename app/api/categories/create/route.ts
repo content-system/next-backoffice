@@ -43,12 +43,13 @@ export async function POST(req: NextRequest) {
   const service = getCategoryService()
 
   try {
-    const result = await service.update(category)
+   const result = await service.create(category)
 
     return NextResponse.json(result, {
       status: isSuccessful(result) ? 200 : 410,
     })
   } catch (err) {
+
     logger.error(`Error at POST /categories: ${toString(err)}`)
 
     return new NextResponse("Internal Server Error", {

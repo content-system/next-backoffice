@@ -35,8 +35,12 @@ export default async function CategoriesForm({ searchParams }: { searchParams: P
 
     return (
       <div>
-        <header>
-          <h2>{resource.categories}</h2>
+        <header className="page-header">
+            <h2>{resource.categories}</h2>
+
+          <Link href="/categories/new" className="btn-add">
+    +
+         </Link>
         </header>
         <div className="main-body">
           <Form id="categoriesForm" name="categoriesForm" className="form" noValidate={true} action="/categories">

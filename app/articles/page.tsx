@@ -1,111 +1,213 @@
 import { Error } from "@components/error"
 import { Pagination } from "@components/pagination"
 import Search from "@components/search"
-import { Item, Sort } from "@components/sort"
+import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
 import { hasPermission } from "@lib/authorizor"
 import { logForbidden, logger, toString } from "@lib/logger"
-import { defaultLimit, getDateFormat, getResource, limits, sort } from "@resources"
+import {
+  defaultLimit,
+  getDateFormat,
+  getResource,
+  getStatusName,
+  limits,
+} from "@resources"
 import { ArticleFilter, getArticleService } from "@service/article"
 import Form from "next/form"
 import { headers } from "next/headers"
 import Link from "next/link"
-import { buildFilter, datetimeToString, formatDateTime, read, removeLimit, removePage, removeSort } from "web-one"
 
-export default async function News({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+import {
+  buildFilter,
+  buildSortSearch,
+  datetimeToString,
+  formatDateTime,
+  getOffset,
+  read,
+  removeLimit,
+  removePage,
+  write,
+} from "web-one"
+
+export default async function News({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
+
   const canRead = await hasPermission(read)
+  const canWrite = await hasPermission(write)
+
   if (!canRead) {
     logForbidden(account)
-    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+    return (
+      <Error
+        title={resource.error_403_title}
+        message={resource.error_403_message}
+      />
+    )
   }
 
   const query = await searchParams
 
-  const filter = buildFilter<ArticleFilter>(query, defaultLimit, ["publishedAt"])
+  const filter = buildFilter<ArticleFilter>(
+    query,
+    defaultLimit,
+    ["publishedAt"]
+  )
+
   const service = getArticleService()
+
   try {
-    const { list, total } = await service.search(filter, filter.limit, filter.page)
+    const { list, total } = await service.search(
+      filter,
+      filter.limit,
+      filter.page
+    )
 
     const search = removePage(query)
     const limitSearch = removeLimit(query)
 
-    const sortSearch = removeSort(query)
-    const prefix = sortSearch ? `?${sortSearch}&` : "?"
-    const sort1: Item = { id: "timeDescSort", value: `${prefix}${sort}=-publishedAt`, text: resource.sort_time_desc }
-    const sort2: Item = { id: "timeAscSort", value: `${prefix}${sort}=publishedAt`, text: resource.sort_time_asc }
-    const sortText = filter.sort == "publishedAt" ? resource.sort_desc_time_asc : resource.sort_desc_time_desc
-    const items = [sort1, sort2]
+    const fields = [
+      "id",
+      "title",
+      "slug",
+      "publishedAt",
+      "status",
+    ]
 
-    const dateFormat = getDateFormat(account?.language, account?.dateFormat)
+    const sort = buildSortSearch(query, fields, filter.sort)
+    const offset = getOffset(filter.limit, filter.page)
+
+    const dateFormat = getDateFormat(
+      account?.language,
+      account?.dateFormat
+    )
 
     return (
-      <div>
-        <header>
+  <div>
+    <div className="main-body">
+      <Form
+        id="articlesForm"
+        name="articlesForm"
+        className="form"
+        noValidate={true}
+        action="/articles"
+      >
+        <header className="page-header">
           <h2>{resource.news}</h2>
+
+          {canWrite && (
+            <Link href="/articles/new" className="btn-new" />
+          )}
         </header>
-        <div className="main-body">
-          <Form id="articlesForm" name="articlesForm" className="form" noValidate={true} action="/news">
-            <section className="row search-group">
-              <Search
-                className="col s12 m6 l4 xl6 search-input"
-                limit={filter.limit}
-                limits={limits}
-                limitSearch={limitSearch}
-                id="q"
-                name="q"
-                defaultValue={filter.q}
-                maxLength={40}
-                placeholder={resource.keyword}
-              />
-              <Sort id="sortBtn" className="col s12 m6 l4 xl3 sort" text={sortText} items={items} dropDownId="sortDropdown" />
-              <Pagination className="col s12 l4 xl3" total={total} size={filter.limit} page={filter.page} search={search} />
-            </section>
-            <section className="row search-group advance-search" hidden>
-              <label className="col s12 m6">
-                {resource.published_at_from}
-                <input
-                  type="datetime-local"
-                  step=".010"
-                  id="publishedAt_min"
-                  name="publishedAt.min"
-                  data-field="publishedAt.min"
-                  defaultValue={datetimeToString(filter.publishedAt?.min)}
+ 
+        <section className="row search-group">
+          <Search
+            className="col s12 m6 l4 xl6 search-input"
+            limit={filter.limit}
+            limits={limits}
+            limitSearch={limitSearch}
+            id="q"
+            name="q"
+            defaultValue={filter.q}
+            maxLength={40}
+            placeholder={resource.keyword}
+          />
+
+          <Pagination
+            className="col s12 l4 xl3"
+            total={total}
+            size={filter.limit}
+            page={filter.page}
+            search={search}
+          />
+        </section>
+
+        {/* Nếu chưa dùng tìm kiếm nâng cao thì bỏ hẳn section này */}
+      </Form>
+
+      <div className="table-responsive">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>{resource.number}</th>
+
+              <th data-field="id">
+                <SortLink
+                  id="idSort"
+                  href={sort.id.url}
+                  type={sort.id.type}
+                  text={resource.id}
                 />
-              </label>
-              <label className="col s12 m6">
-                {resource.published_at_to}
-                <input
-                  type="datetime-local"
-                  step=".010"
-                  id="publishedAt_max"
-                  name="publishedAt.max"
-                  data-field="publishedAt.max"
-                  defaultValue={datetimeToString(filter.publishedAt?.max)}
+              </th>
+
+              <th data-field="title">
+                <SortLink
+                  id="titleSort"
+                  href={sort.title.url}
+                  type={sort.title.type}
+                  text={resource.title}
                 />
-              </label>
-            </section>
-          </Form>
-          <ul className="row list card-grid">
-            {list.map((item, i) => {
-              return (
-                <li key={i} className="col s12 m6 l4 xl3 img-card">
-                  <section>
-                    <div className="cover" style={{ backgroundImage: `url('${item.thumbnail}')` }}></div>
-                    <Link href={`/articles/${item.id}`} prefetch={false}>
-                      {item.title}
-                    </Link>
-                    <p>{formatDateTime(item.publishedAt, dateFormat)}</p>
-                    <p>{item.description}</p>
-                  </section>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+              </th>
+
+              <th data-field="slug">
+                <SortLink
+                  id="slugSort"
+                  href={sort.slug.url}
+                  type={sort.slug.type}
+                  text="Slug"
+                />
+              </th>
+
+              <th data-field="publishedAt">
+                <SortLink
+                  id="publishedAtSort"
+                  href={sort.publishedAt.url}
+                  type={sort.publishedAt.type}
+                  text={resource.published_at}
+                />
+              </th>
+
+              <th data-field="status">
+                <SortLink
+                  id="statusSort"
+                  href={sort.status.url}
+                  type={sort.status.type}
+                  text={resource.status}
+                />
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {list.map((item, i) => (
+              <tr key={i}>
+                <td className="text-right">{offset + i + 1}</td>
+
+                <td>{item.id}</td>
+
+                <td>
+                  <Link href={`/articles/${item.id}`} prefetch={false}>
+                    {item.title}
+                  </Link>
+                </td>
+
+                <td>{item.slug}</td>
+
+                <td>{formatDateTime(item.publishedAt, dateFormat)}</td>
+
+                <td>{getStatusName(item.status, resource)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    )
+    </div>
+  </div>
+)
   } catch (err) {
     const headerList = await headers()
     const pathname = headerList.get("x-current-path")

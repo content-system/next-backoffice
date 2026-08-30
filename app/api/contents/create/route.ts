@@ -43,11 +43,11 @@ console.log("After:", content.tags, Array.isArray(content.tags))
   const service = getContentService()
 
   try {
-    const res = await service.update(content)
+    const res = await service.create(content)
     const status = isSuccessful(res) ? 200 : 410
     return NextResponse.json(res, { status })
   } catch (err) {
-    logger.error(`Error at POST /contents: ${toString(err)}`)
+    logger.error(`Error at POST /contents/create: ${toString(err)}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

@@ -1,16 +1,24 @@
 import { Error } from "@components/error"
 import { Pagination } from "@components/pagination"
 import Search from "@components/search"
-import { Item, Sort } from "@components/sort"
+import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
 import { hasPermission } from "@lib/authorizor"
 import { logForbidden, logger, toString } from "@lib/logger"
-import { defaultLimit, getDateFormat, getResource, limits, sort } from "@resources"
+import { defaultLimit, getDateFormat, getResource, limits } from "@resources"
 import { getJobService, JobFilter } from "@service/job"
 import Form from "next/form"
 import { headers } from "next/headers"
 import Link from "next/link"
-import { buildFilter, datetimeToString, formatDateTime, read, removeLimit, removePage, removeSort } from "web-one"
+import {buildFilter,buildSortSearch,datetimeToString,formatDateTime,getOffset,read,removeLimit,removePage,} from "web-one"
+
+const fields = [
+  "id",
+  "title",
+  "company",
+  "location",
+  "publishedAt",
+]
 
 export default async function Jobs({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
@@ -26,25 +34,26 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
   const filter = buildFilter<JobFilter>(query, defaultLimit, ["publishedAt"])
   const service = getJobService()
   try {
-    const { list, total } = await service.search(filter, filter.limit, filter.page)
+   const { list, total } = await service.search( filter,filter.limit,filter.page,fields)
 
     const search = removePage(query)
     const limitSearch = removeLimit(query)
+    const tableSort = buildSortSearch(query, fields, filter.sort)
+    const offset = getOffset(filter.limit, filter.page)
 
-    const sortSearch = removeSort(query)
-    const prefix = sortSearch ? `?${sortSearch}&` : "?"
-    const sort1: Item = { id: "timeDescSort", value: `${prefix}${sort}=-publishedAt`, text: resource.sort_time_desc }
-    const sort2: Item = { id: "timeAscSort", value: `${prefix}${sort}=publishedAt`, text: resource.sort_time_asc }
-    const sortText = filter.sort == "publishedAt" ? resource.sort_desc_time_asc : resource.sort_desc_time_desc
-    const items = [sort1, sort2]
+    
 
     const dateFormat = getDateFormat(account?.language, account?.dateFormat)
 
     return (
       <div>
-        <header>
-          <h2>{resource.news}</h2>
-        </header>
+        <header className="page-header">
+          <h2>{resource.jobs}</h2>
+
+        <Link href="/jobs/new" className="btn-add">
+           +
+         </Link>
+         </header>
         <div className="main-body">
           <Form id="jobsForm" name="jobsForm" className="form" noValidate={true} action="/jobs">
             <section className="row search-group">
@@ -59,7 +68,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
                 maxLength={40}
                 placeholder={resource.keyword}
               />
-              <Sort id="sortBtn" className="col s12 m6 l4 xl3 sort" text={sortText} items={items} dropDownId="sortDropdown" />
+        
               <Pagination className="col s12 l4 xl3" total={total} size={filter.limit} page={filter.page} search={search} />
             </section>
             <section className="row search-group advance-search" hidden>
@@ -87,21 +96,82 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
               </label>
             </section>
           </Form>
-          <ul className="row list card-grid">
-            {list.map((item, i) => {
-              return (
-                <li key={i} className="col s12 m6 l4 xl3 list-item">
-                  <Link href={`/jobs/${item.id}`} prefetch={false}>
-                    {item.title}
-                  </Link>
-                  <p>
-                    {item.location} {item.quantity}
-                    <span>{formatDateTime(item.publishedAt, dateFormat)}</span>
-                  </p>
-                </li>
-              )
-            })}
-          </ul>
+          <div className="table-responsive">
+  <table className="table">
+    <thead>
+      <tr>
+        <th>No.</th>
+
+        <th data-field="id">
+  <SortLink
+    id="idSort"
+    href={tableSort.id.url}
+    type={tableSort.id.type}
+    text="ID"
+  />
+</th>
+
+        <th data-field="title">
+  <SortLink
+    id="titleSort"
+    href={tableSort.title.url}
+    type={tableSort.title.type}
+    text="Title"
+  />
+</th>
+
+       <th data-field="company">
+  <SortLink
+    id="companySort"
+    href={tableSort.company.url}
+    type={tableSort.company.type}
+    text="Company"
+  />
+</th>
+
+        <th data-field="location">
+  <SortLink
+    id="locationSort"
+    href={tableSort.location.url}
+    type={tableSort.location.type}
+    text="Location"
+  />
+</th>
+
+        <th data-field="publishedAt">
+  <SortLink
+    id="publishedAtSort"
+    href={tableSort.publishedAt.url}
+    type={tableSort.publishedAt.type}
+    text="Published At"
+  />
+</th> 
+      </tr>
+    </thead>
+
+    <tbody>
+      {list.map((job, i) => (
+        <tr key={job.id}>
+          <td>{offset + i + 1}</td>
+
+          <td>{job.id}</td>
+
+          <td>
+            <Link href={`/jobs/${job.id}`} prefetch={false}>
+              {job.title}
+            </Link>
+          </td>
+
+          <td>{job.company}</td>
+
+          <td>{job.location}</td>
+
+          <td>{formatDateTime(job.publishedAt, dateFormat)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
         </div>
       </div>
     )
