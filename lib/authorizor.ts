@@ -26,14 +26,19 @@ export async function authorize(index?: number): Promise<number> {
   const headerList = await headers()
   const pathname = headerList.get("x-current-path") as string
 
-  const path = getPath(pathname, index)
-
+  let path = getPath(pathname, index)
+  if (path.startsWith("/api/")) {
+    path = path.substring(4)
+  }
   const privilege = await privilegeLoader.getPrivilege(account.id, path)
   return privilege
 }
 
 export async function hasPermission(permission: number, i?: number): Promise<boolean> {
   const privilege = await authorize(i)
+  if (privilege == 0) {
+    return false
+  }
   return permission > 0 || (privilege & permission) == permission
 }
 
