@@ -1,6 +1,6 @@
 import { DB } from "onecore"
 import { Pool } from "pg"
-import { PoolManager } from "pg-extension"
+import { PoolManager } from "postgres-kit"
 import { config } from "../config"
 
 export const globalForDB = globalThis as unknown as {

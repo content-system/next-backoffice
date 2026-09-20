@@ -36,7 +36,7 @@ interface Module {
 }
 export class SqlRoleRepository extends SearchRepository<Role, RoleFilter> implements RoleRepository {
   private roleModuleMap: StringMap
-  map?: StringMap
+  map: StringMap
   attributes: Attributes
   constructor(protected db: DB) {
     super(db, "roles", roleModel)
@@ -89,7 +89,7 @@ export class SqlRoleRepository extends SearchRepository<Role, RoleFilter> implem
   }
   update(role: Role): Promise<number> {
     const stmts: Statement[] = []
-    const stmt = buildToUpdate(role, "roles", roleModel, this.db.param)
+    const stmt = buildToUpdate(role, "roles", roleModel, this.db.param, this.primaryKeys)
     let firstSuccess = false
     if (stmt.query) {
       stmts.push(stmt)

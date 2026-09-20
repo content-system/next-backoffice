@@ -11,7 +11,7 @@ import Form from "next/form"
 import Link from "next/link"
 import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage } from "web-one"
 
-const fields = ["name", "email", "phone", "company", "country"]
+const fields = ["id", "name", "email", "phone", "company", "country"]
 
 export default async function ContactsForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()

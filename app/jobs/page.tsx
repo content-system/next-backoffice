@@ -10,15 +10,9 @@ import { getJobService, JobFilter } from "@service/job"
 import Form from "next/form"
 import { headers } from "next/headers"
 import Link from "next/link"
-import {buildFilter,buildSortSearch,datetimeToString,formatDateTime,getOffset,read,removeLimit,removePage,} from "web-one"
+import { buildFilter, buildSortSearch, datetimeToString, formatDateTime, getOffset, read, removeLimit, removePage } from "web-one"
 
-const fields = [
-  "id",
-  "title",
-  "company",
-  "location",
-  "publishedAt",
-]
+const fields = ["id", "title", "company", "location", "publishedAt"]
 
 export default async function Jobs({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
@@ -34,14 +28,12 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
   const filter = buildFilter<JobFilter>(query, defaultLimit, ["publishedAt"])
   const service = getJobService()
   try {
-   const { list, total } = await service.search( filter,filter.limit,filter.page,fields)
+    const { list, total } = await service.search(filter, filter.limit, filter.page, fields)
 
     const search = removePage(query)
     const limitSearch = removeLimit(query)
     const tableSort = buildSortSearch(query, fields, filter.sort)
     const offset = getOffset(filter.limit, filter.page)
-
-    
 
     const dateFormat = getDateFormat(account?.language, account?.dateFormat)
 
@@ -50,10 +42,10 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
         <header className="page-header">
           <h2>{resource.jobs}</h2>
 
-        <Link href="/jobs/new" className="btn-add">
-           +
-         </Link>
-         </header>
+          <Link href="/jobs/new" className="btn-add">
+            +
+          </Link>
+        </header>
         <div className="main-body">
           <Form id="jobsForm" name="jobsForm" className="form" noValidate={true} action="/jobs">
             <section className="row search-group">
@@ -68,7 +60,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
                 maxLength={40}
                 placeholder={resource.keyword}
               />
-        
+
               <Pagination className="col s12 l4 xl3" total={total} size={filter.limit} page={filter.page} search={search} />
             </section>
             <section className="row search-group advance-search" hidden>
@@ -97,81 +89,56 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
             </section>
           </Form>
           <div className="table-responsive">
-  <table className="table">
-    <thead>
-      <tr>
-        <th>No.</th>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>No.</th>
 
-        <th data-field="id">
-  <SortLink
-    id="idSort"
-    href={tableSort.id.url}
-    type={tableSort.id.type}
-    text="ID"
-  />
-</th>
+                  <th data-field="id">
+                    <SortLink id="idSort" href={tableSort.id.url} type={tableSort.id.type} text="ID" />
+                  </th>
 
-        <th data-field="title">
-  <SortLink
-    id="titleSort"
-    href={tableSort.title.url}
-    type={tableSort.title.type}
-    text="Title"
-  />
-</th>
+                  <th data-field="title">
+                    <SortLink id="titleSort" href={tableSort.title.url} type={tableSort.title.type} text="Title" />
+                  </th>
 
-       <th data-field="company">
-  <SortLink
-    id="companySort"
-    href={tableSort.company.url}
-    type={tableSort.company.type}
-    text="Company"
-  />
-</th>
+                  <th data-field="company">
+                    <SortLink id="companySort" href={tableSort.company.url} type={tableSort.company.type} text="Company" />
+                  </th>
 
-        <th data-field="location">
-  <SortLink
-    id="locationSort"
-    href={tableSort.location.url}
-    type={tableSort.location.type}
-    text="Location"
-  />
-</th>
+                  <th data-field="location">
+                    <SortLink id="locationSort" href={tableSort.location.url} type={tableSort.location.type} text="Location" />
+                  </th>
 
-        <th data-field="publishedAt">
-  <SortLink
-    id="publishedAtSort"
-    href={tableSort.publishedAt.url}
-    type={tableSort.publishedAt.type}
-    text="Published At"
-  />
-</th> 
-      </tr>
-    </thead>
+                  <th data-field="publishedAt">
+                    <SortLink id="publishedAtSort" href={tableSort.publishedAt.url} type={tableSort.publishedAt.type} text="Published At" />
+                  </th>
+                </tr>
+              </thead>
 
-    <tbody>
-      {list.map((job, i) => (
-        <tr key={job.id}>
-          <td>{offset + i + 1}</td>
+              <tbody>
+                {list.map((job, i) => (
+                  <tr key={job.id}>
+                    <td>{offset + i + 1}</td>
 
-          <td>{job.id}</td>
+                    <td>{job.id}</td>
 
-          <td>
-            <Link href={`/jobs/${job.id}`} prefetch={false}>
-              {job.title}
-            </Link>
-          </td>
+                    <td>
+                      <Link href={`/jobs/${job.id}`} prefetch={false}>
+                        {job.title}
+                      </Link>
+                    </td>
 
-          <td>{job.company}</td>
+                    <td>{job.company}</td>
 
-          <td>{job.location}</td>
+                    <td>{job.location}</td>
 
-          <td>{formatDateTime(job.publishedAt, dateFormat)}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+                    <td>{formatDateTime(job.publishedAt, dateFormat)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     )

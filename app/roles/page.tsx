@@ -3,20 +3,22 @@ import { Pagination } from "@components/pagination"
 import Search from "@components/search"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
-import { hasPermission } from "@lib/authorizor"
+import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden } from "@lib/logger"
 import { defaultLimit, getResource, getStatusName, limits } from "@resources"
 import { getRoleService, RoleFilter } from "@service/role"
 import Form from "next/form"
 import Link from "next/link"
-import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage } from "web-one"
+import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage, write } from "web-one"
 
 const fields = ["roleId", "roleName", "remark", "status"]
 
 export default async function RolesForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
-  const canRead = await hasPermission(read)
+  const permission = await authorize()
+  const canRead = hasPrivilege(permission, read)
+  const canWrite = hasPrivilege(permission, write)
   if (!canRead) {
     logForbidden(account)
     return <Error title={resource.error_403_title} message={resource.error_403_message} />
@@ -37,6 +39,7 @@ export default async function RolesForm({ searchParams }: { searchParams: Promis
       <div>
         <header>
           <h2>{resource.roles}</h2>
+          {canWrite && <Link href="/users/new" id="newBtn" className="btn-new" prefetch={false} />}
         </header>
         <div className="main-body">
           <Form id="rolesForm" name="rolesForm" className="form" noValidate={true} action="/roles">

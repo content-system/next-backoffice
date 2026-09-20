@@ -1,5 +1,5 @@
 import { Attributes, DB, Filter, SearchResult, Statement } from "onecore";
-import { param } from "pg-extension";
+import { param } from "postgres-kit";
 import { buildSort, SearchRepository } from "sql-core";
 
 export interface Rate {

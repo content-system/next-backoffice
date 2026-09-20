@@ -45,7 +45,19 @@ export default async function SettingsForm() {
           </label>
         </div>
         <footer>
-          <SubmitButton type="submit" id="btnSubmit" name="btnSubmit" api="/api/settings">
+          <SubmitButton
+            type="submit"
+            id="btnSubmit"
+            name="btnSubmit"
+            api="/api/settings"
+            confirmMessage={resource.msg_confirm_save}
+            successMessage={resource.msg_save_success}
+            forbiddenError={resource.error_403}
+            parsingError={resource.error_response_body}
+            networkError={resource.error_network}
+            conflictError={resource.error_409}
+            goneError={resource.error_410}
+          >
             {resource.submit}
           </SubmitButton>
         </footer>

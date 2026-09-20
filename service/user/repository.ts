@@ -1,5 +1,5 @@
 import { Attributes, StringMap } from "onecore"
-import { param } from "pg-extension"
+import { param } from "postgres-kit"
 import { buildMap, buildSort, buildToInsert, buildToInsertBatch, buildToUpdate, DB, SearchRepository, Statement } from "sql-core"
 import { User, UserFilter, userModel, UserRepository } from "./user"
 
@@ -137,7 +137,7 @@ export class SqlUserRepository extends SearchRepository<User, UserFilter> implem
   }
   update(user: User): Promise<number> {
     const stmts: Statement[] = []
-    const stmt = buildToUpdate(user, "users", userModel, this.db.param)
+    const stmt = buildToUpdate(user, "users", userModel, this.db.param, this.primaryKeys)
     let firstSuccess = false
     if (stmt.query) {
       stmts.push(stmt)

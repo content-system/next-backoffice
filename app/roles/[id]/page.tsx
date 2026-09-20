@@ -6,26 +6,34 @@ import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
 import { getResource, Status } from "@resources"
-import { getRoleService } from "@service/role"
-import { read } from "web-one"
+import { getRoleService, Role } from "@service/role"
+import { create, read, write } from "web-one"
 
 export default async function RoleForm({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const newMode = id === Status.New
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
   const permission = await authorize(1)
-  if (!hasPrivilege(permission, read)) {
+  const canRead = hasPrivilege(permission, read)
+  const canWrite = hasPrivilege(permission, write)
+
+  if (!canRead || (newMode && !canWrite)) {
     logForbidden(account)
     return <Error title={resource.error_403_title} message={resource.error_403_message} />
   }
 
-  const { id } = await params
   const service = getRoleService()
   try {
-    const role = await service.load(id)
-    if (!role) {
-      logger.warn(`Role not found: ${id}`)
-      return <Error title={resource.error_404_title} message={resource.error_404_message} />
+    let role: Role | null = create<Role>(Status.Active)
+    if (!newMode) {
+      role = await service.load(id)
+      if (!role) {
+        logger.warn(`Role not found: ${id}`)
+        return <Error title={resource.error_404_title} message={resource.error_404_message} />
+      }
     }
+
     return (
       <form id="roleForm" name="roleForm" className="form" noValidate={true} data-required-error={resource.error_required}>
         <header>
@@ -40,6 +48,7 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
               id="roleId"
               name="roleId"
               defaultValue={role.roleId}
+              readOnly={!newMode}
               maxLength={100}
               required={true}
               requiredError={formatText(resource.error_required, resource.role_id)}
@@ -78,7 +87,19 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
           </label>
         </div>
         <footer>
-          <SubmitButton type="submit" id="btnSubmit" name="btnSubmit" api="/api/roles">
+          <SubmitButton
+            type="submit"
+            id="btnSubmit"
+            name="btnSubmit"
+            api={`/api/roles/${id}`}
+            confirmMessage={resource.msg_confirm_save}
+            successMessage={resource.msg_save_success}
+            forbiddenError={resource.error_403}
+            parsingError={resource.error_response_body}
+            networkError={resource.error_network}
+            conflictError={resource.error_409}
+            goneError={resource.error_410}
+          >
             {resource.submit}
           </SubmitButton>
         </footer>

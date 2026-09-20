@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { StringMap } from "onecore"
-import { ToggleMenu, ToggleUniversalSearch } from "./client"
+import { ButtonQ, InputQ, ToggleMenu, ToggleUniversalSearch } from "./client"
 import { ToggleSidebar, ToggleTheme } from "./menu"
 
 export interface Props {
@@ -21,9 +21,9 @@ export default async function PageHeader({ resource }: Props) {
             <img className="logo" src="../logo192.png" alt="Logo of The Company" />
           </div>
           <label className="search-input">
-            <input type="text" id="q" name="q" maxLength={80} placeholder={resource.keyword} autoComplete="off" />
-            <button type="button" hidden className="btn-remove-text"></button>
-            <button type="button" className="btn-search"></button>
+            <InputQ id="globalQ" name="q" maxLength={80} placeholder={resource.keyword} targetClass="btn-remove-text" />
+            <ButtonQ type="button" id="clearQBtn" name="clearQBtn" className="btn-remove-text" targetName="q" />
+            <button type="submit" id="searchBtn" className="btn-search" />
           </label>
           <section className="quick-nav">
             <div className="dropdown-menu-profile">
