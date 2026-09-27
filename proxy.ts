@@ -53,6 +53,6 @@ function isSkipAuthorization(path: string): boolean {
 export const config = {
   matcher: [
     // match all routes except static files and APIs
-    "/((?!api|_next/static|_next/image|favicon.ico|logo192\\.png|logo512\\.png|manifest\\.json|robots\\.txt|static).*)",
+    "/((?!_next/static|_next/image|favicon.ico|logo192\\.png|logo512\\.png|manifest\\.json|robots\\.txt|static).*)",
   ],
 }

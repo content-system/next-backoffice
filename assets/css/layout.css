@@ -246,6 +246,11 @@
 .dropdown-content-profile > li > span:hover {
   text-decoration: underline;
 }
+
+.dropdown-content-profile hr {
+  margin: 0;
+}
+
 /*
 .dropdown-item-profile.active,
 .dropdown-item-profile:active {
@@ -263,6 +268,6 @@
     top: auto !important;
     bottom: 100%;
     margin-top: 0;
-    margin-bottom: 0.125rem;
+    margin-bottom: 0;
   }
 }

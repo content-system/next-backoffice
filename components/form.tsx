@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { FocusEvent, FocusEventHandler, KeyboardEvent, MouseEvent, ReactNode } from "react"
 import {
   addClass,
@@ -51,6 +52,7 @@ interface SubmitProps {
   conflictError: string
   goneError: string
   forbiddenError: string
+  successUrl?: string
 }
 
 export function SubmitButton({
@@ -67,7 +69,9 @@ export function SubmitButton({
   conflictError,
   goneError,
   forbiddenError,
+  successUrl,
 }: SubmitProps) {
+  const router = useRouter()
   const onClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     const target = e.target as HTMLButtonElement
@@ -89,6 +93,13 @@ export function SubmitButton({
             .then((res) => {
               if (res.ok) {
                 toast(successMessage)
+                if (successUrl) {
+                  if (successUrl === "back") {
+                    router.back()
+                  } else {
+                    router.push(successUrl)
+                  }
+                }
               } else {
                 if (res.status === 422) {
                   res

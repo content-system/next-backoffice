@@ -99,6 +99,7 @@ export default async function RoleForm({ params }: { params: Promise<{ id: strin
             networkError={resource.error_network}
             conflictError={resource.error_409}
             goneError={resource.error_410}
+            successUrl="back"
           >
             {resource.submit}
           </SubmitButton>
