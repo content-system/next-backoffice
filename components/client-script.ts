@@ -151,45 +151,25 @@ export function showAlert(
 
 export function showConfirm(
   msg: string,
-  yesCallback?: () => void,
   header?: string,
+  yesCallback?: () => void,
   btnLeftText?: string,
   btnRightText?: string,
   noCallback?: () => void,
-  element?: string,
 ): void {
-  const name = element ? element : "sysMessageHeader"
-  const sysMessageHeader = document.getElementById(name) as HTMLElement
-  const h = header ? header : sysMessageHeader.getAttribute("data-confirm")
-  showAlert(msg, h, "Confirm", "Confirm", btnLeftText, btnRightText, yesCallback, noCallback)
+  showAlert(msg, header, "Confirm", "Confirm", btnLeftText, btnRightText, yesCallback, noCallback)
 }
-export function alertError(msg: string, detail?: string, callback?: () => void, header?: string, element?: string): void {
-  const name = element ? element : "sysMessageHeader"
-  const sysMessageHeader = document.getElementById(name) as HTMLElement
-  const h = header ? header : sysMessageHeader.getAttribute("data-error")
-  const buttonText = header ? header : sysMessageHeader.getAttribute("data-ok")
-  showAlert(msg, h, "Alert", "Error", "", buttonText, callback, undefined, detail)
+export function alertError(msg: string, header?: string, detail?: string, callback?: () => void, buttonText?: string): void {
+  showAlert(msg, header, "Alert", "Error", "", buttonText, callback, undefined, detail)
 }
-export function alertWarning(msg: string, callback?: () => void, header?: string, element?: string): void {
-  const name = element ? element : "sysMessageHeader"
-  const sysMessageHeader = document.getElementById(name) as HTMLElement
-  const h = header ? header : sysMessageHeader.getAttribute("data-warning")
-  const buttonText = header ? header : sysMessageHeader.getAttribute("data-ok")
-  showAlert(msg, h, "Alert", "Warning", "", buttonText, callback, undefined)
+export function alertWarning(msg: string, header?: string, callback?: () => void, buttonText?: string): void {
+  showAlert(msg, header, "Alert", "Warning", "", buttonText, callback, undefined)
 }
-export function alertInfo(msg: string, callback?: () => void, header?: string, element?: string): void {
-  const name = element ? element : "sysMessageHeader"
-  const sysMessageHeader = document.getElementById(name) as HTMLElement
-  const h = header ? header : sysMessageHeader.getAttribute("data-info")
-  const buttonText = header ? header : sysMessageHeader.getAttribute("data-ok")
-  showAlert(msg, h, "Alert", "Info", "", buttonText, callback, undefined)
+export function alertInfo(msg: string, header?: string, callback?: () => void, buttonText?: string): void {
+  showAlert(msg, header, "Alert", "Info", "", buttonText, callback, undefined)
 }
-export function alertSuccess(msg: string, callback?: () => void, header?: string, element?: string): void {
-  const name = element ? element : "sysMessageHeader"
-  const sysMessageHeader = document.getElementById(name) as HTMLElement
-  const h = header ? header : sysMessageHeader.getAttribute("data-success")
-  const buttonText = header ? header : sysMessageHeader.getAttribute("data-ok")
-  showAlert(msg, h, "Alert", "Success", "", buttonText, callback, undefined)
+export function alertSuccess(msg: string, header?: string, callback?: () => void, buttonText?: string): void {
+  showAlert(msg, header, "Alert", "Success", "", buttonText, callback, undefined)
 }
 
 // Keyboard shortcuts that should always be allowed

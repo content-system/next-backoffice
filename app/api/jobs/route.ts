@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
 import { getJobService, Job, jobModel } from "@service/job"
 import { NextRequest, NextResponse } from "next/server"
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const status = isSuccessful(res) ? 200 : 410
     return NextResponse.json(res, { status })
   } catch (err) {
-    logger.error(`Error at POST /jobs: ${toString(err)}`)
+    logger.error(`Error at POST /jobs: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

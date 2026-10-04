@@ -1,11 +1,7 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
-import {
-  Article,
-  articleModel,
-  getArticleService,
-} from "@service/article"
+import { Article, articleModel, getArticleService } from "@service/article"
 import { NextRequest, NextResponse } from "next/server"
 import { validate } from "validation-core"
 import { isSuccessful } from "web-one"
@@ -62,9 +58,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result, { status })
   } catch (err) {
-    logger.error(
-      `Error at POST /articles: ${toString(err)}`
-    )
+    logger.error(`Error at POST /articles: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,
@@ -115,9 +109,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(result, { status })
   } catch (err) {
-    logger.error(
-      `Error at PUT /articles: ${toString(err)}`
-    )
+    logger.error(`Error at PUT /articles: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,
@@ -128,9 +120,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-) {
+export async function DELETE(req: NextRequest) {
   const account = await getCurrentUser()
 
   if (!account) {
@@ -150,10 +140,7 @@ export async function DELETE(
     const id = url.pathname.split("/").pop()
 
     if (!id) {
-      return NextResponse.json(
-        { message: "Article ID is required" },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: "Article ID is required" }, { status: 400 })
     }
 
     console.log("DELETE ARTICLE ID =", id)
@@ -178,9 +165,7 @@ export async function DELETE(
       status: 400,
     })
   } catch (err) {
-    logger.error(
-      `Error at DELETE /articles: ${toString(err)}`
-    )
+    logger.error(`Error at DELETE /articles: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

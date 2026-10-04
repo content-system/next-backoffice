@@ -175,8 +175,10 @@ export default async function UserForm({ params }: { params: Promise<{ id: strin
             id="btnSubmit"
             name="btnSubmit"
             api={`/api/users/${id}`}
+            confirmHeader={resource.header_confirm}
             confirmMessage={resource.msg_confirm_save}
             successMessage={resource.msg_save_success}
+            errorHeader={resource.header_error}
             forbiddenError={resource.error_403}
             parsingError={resource.error_response_body}
             networkError={resource.error_network}

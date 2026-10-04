@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@lib/account"
 import { hasPermission } from "@lib/authorizor"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource, Status } from "@resources"
 import { getJobService, Job, jobModel } from "@service/job"
 import { NextRequest, NextResponse } from "next/server"
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json(res, { status })
     }
   } catch (err) {
-    logger.error(`Error at POST /jobs/${id}: ${toString(err)}`)
+    logger.error(`Error at POST /jobs/${id}: ${err}`)
     return new NextResponse("Internal Server Error", {
       status: 500,
       headers: { "Content-Type": "text/plain" },

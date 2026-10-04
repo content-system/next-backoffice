@@ -45,8 +45,10 @@ interface SubmitProps {
   className?: string
   children?: ReactNode
   api: string
+  confirmHeader: string
   confirmMessage: string
   successMessage: string
+  errorHeader: string
   networkError: string
   parsingError: string
   conflictError: string
@@ -62,8 +64,10 @@ export function SubmitButton({
   className,
   children,
   api,
+  confirmHeader,
   confirmMessage,
   successMessage,
+  errorHeader,
   networkError,
   parsingError,
   conflictError,
@@ -83,7 +87,7 @@ export function SubmitButton({
       } else {
         const body = decode(form)
         console.log("submit body" + JSON.stringify(body))
-        showConfirm(confirmMessage, () => {
+        showConfirm(confirmMessage, confirmHeader, () => {
           showLoading()
           fetch(api, {
             method: "POST",
@@ -110,17 +114,17 @@ export function SubmitButton({
                         showFormError(form, data)
                       }
                     })
-                    .catch((err) => alertError(parsingError))
+                    .catch((err) => alertError(parsingError, errorHeader))
                 } else if (res.status === 409) {
-                  alertError(conflictError)
+                  alertError(conflictError, errorHeader)
                 } else if (res.status === 410) {
-                  alertError(goneError)
+                  alertError(goneError, errorHeader)
                 } else if (res.status === 403) {
-                  alertError(forbiddenError)
+                  alertError(forbiddenError, errorHeader)
                 }
               }
             })
-            .catch((err) => alertError(networkError))
+            .catch((err) => alertError(networkError, errorHeader))
             .finally(() => {
               hideLoading()
             })

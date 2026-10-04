@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
 import { getSettingsService, Settings, userModel } from "@service/settings"
 import { NextRequest, NextResponse } from "next/server"
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const status = res > 0 ? 200 : 410
     return NextResponse.json(res, { status })
   } catch (err) {
-    logger.error(`Error at POST /settings: ${toString(err)}`)
+    logger.error(`Error at POST /settings: ${err}`)
     return new NextResponse("Internal Server Error", {
       status: 500,
       headers: { "Content-Type": "text/plain" },

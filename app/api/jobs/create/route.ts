@@ -1,11 +1,11 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
 import { getJobService, Job, jobModel } from "@service/job"
+import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 import { validate } from "validation-core"
 import { isSuccessful } from "web-one"
-import { nanoid } from "nanoid"
 
 export async function POST(req: NextRequest) {
   const account = await getCurrentUser()
@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
 
   const job: Job = await req.json()
 
-if (!job.id) {
-  job.id = nanoid(10)
-}
+  if (!job.id) {
+    job.id = nanoid(10)
+  }
 
   if (typeof (job as any).skills === "string") {
     job.skills = ((job as any).skills as string)
@@ -36,10 +36,10 @@ if (!job.id) {
 
   const errors = validate(job, jobModel, resource)
 
- if (errors.length > 0) {
-  console.log(errors)
-  return NextResponse.json(errors, { status: 422 })
-}
+  if (errors.length > 0) {
+    console.log(errors)
+    return NextResponse.json(errors, { status: 422 })
+  }
 
   const service = getJobService()
 
@@ -50,8 +50,8 @@ if (!job.id) {
 
     return NextResponse.json(res, { status })
   } catch (err: any) {
-  console.log(err)
-  logger.error(err)
+    console.log(err)
+    logger.error(err)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

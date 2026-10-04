@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
 import { Content, contentModel, getContentService } from "@service/content"
 import { NextRequest, NextResponse } from "next/server"
@@ -20,19 +20,16 @@ export async function POST(req: NextRequest) {
 
   const content: Content = await req.json()
 
-console.log("Before:", content.tags, typeof content.tags)
+  console.log("Before:", content.tags, typeof content.tags)
 
-if (typeof (content as any).tags === "string") {
-  content.tags = ((content as any).tags as string)
-    .split(",")
-    .map((tag: string) => tag.trim())
-    .filter((tag: string) => tag.length > 0)
-}
+  if (typeof (content as any).tags === "string") {
+    content.tags = ((content as any).tags as string)
+      .split(",")
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag.length > 0)
+  }
 
-console.log("After:", content.tags, Array.isArray(content.tags))
-
-
-
+  console.log("After:", content.tags, Array.isArray(content.tags))
 
   const errors = validate(content, contentModel, resource)
 
@@ -47,7 +44,7 @@ console.log("After:", content.tags, Array.isArray(content.tags))
     const status = isSuccessful(res) ? 200 : 410
     return NextResponse.json(res, { status })
   } catch (err) {
-    logger.error(`Error at POST /contents/create: ${toString(err)}`)
+    logger.error(`Error at POST /contents/create: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

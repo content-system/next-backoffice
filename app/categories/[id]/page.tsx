@@ -194,13 +194,16 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
             id="btnSubmit"
             name="btnSubmit"
             api="/api/categories"
+            confirmHeader={resource.header_confirm}
             confirmMessage={resource.msg_confirm_save}
             successMessage={resource.msg_save_success}
+            errorHeader={resource.header_error}
             forbiddenError={resource.error_403}
             parsingError={resource.error_response_body}
             networkError={resource.error_network}
             conflictError={resource.error_409}
             goneError={resource.error_410}
+            successUrl="back"
           >
             {resource.submit}
           </SubmitButton>

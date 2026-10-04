@@ -4,7 +4,7 @@ import Search from "@components/search"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
 import { hasPermission } from "@lib/authorizor"
-import { logForbidden, logger, toString } from "@lib/logger"
+import { logForbidden, logger } from "@lib/logger"
 import { defaultLimit, getDateFormat, getResource, limits } from "@resources"
 import { getJobService, JobFilter } from "@service/job"
 import Form from "next/form"
@@ -145,7 +145,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
   } catch (err) {
     const headerList = await headers()
     const pathname = headerList.get("x-current-path")
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logger.error(`Error at ${pathname}: ${err}`)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

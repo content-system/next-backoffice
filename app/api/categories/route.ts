@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getResource } from "@resources"
 import { Category, categoryModel, getCategoryService } from "@service/category"
 import { NextRequest, NextResponse } from "next/server"
@@ -24,12 +24,7 @@ export async function POST(req: NextRequest) {
 
   const category: Category = {
     ...body,
-    sequence:
-      body.sequence === undefined ||
-      body.sequence === null ||
-      body.sequence === ""
-        ? 0
-        : Number(body.sequence),
+    sequence: body.sequence === undefined || body.sequence === null || body.sequence === "" ? 0 : Number(body.sequence),
   }
 
   const errors = validate(category, categoryModel, resource)
@@ -49,7 +44,7 @@ export async function POST(req: NextRequest) {
       status: isSuccessful(result) ? 200 : 410,
     })
   } catch (err) {
-    logger.error(`Error at POST /categories: ${toString(err)}`)
+    logger.error(`Error at POST /categories: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

@@ -25,12 +25,5 @@ export async function logForbidden(account?: Account | null) {
 export async function logError(err: any) {
   const headerList = await headers()
   const pathname = headerList.get("x-current-fullpath") as string
-  logger.error(`Error at ${pathname}: ${toString(err)}`)
-}
-export function toString(v: any): string {
-  if (typeof v === "string") {
-    return v
-  } else {
-    return JSON.stringify(v)
-  }
+  logger.error(`Error at ${pathname}: ${err}`)
 }

@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getJobService } from "@service/job"
 import { NextRequest, NextResponse } from "next/server"
 import { isSuccessful } from "web-one"
@@ -27,7 +27,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(res, { status })
   } catch (err) {
-    logger.error(`Error at DELETE /jobs/delete: ${toString(err)}`)
+    logger.error(`Error at DELETE /jobs/delete: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

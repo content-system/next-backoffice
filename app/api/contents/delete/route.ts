@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@lib/account"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getContentService } from "@service/content"
 import { NextRequest, NextResponse } from "next/server"
 import { isSuccessful } from "web-one"
@@ -18,19 +18,19 @@ export async function DELETE(req: NextRequest) {
 
   const { id, lang } = await req.json()
 
-console.log("Delete id =", id)
-console.log("Delete lang =", lang)
+  console.log("Delete id =", id)
+  console.log("Delete lang =", lang)
 
-const service = getContentService()
+  const service = getContentService()
 
-try {
-  const result = await service.delete(id, lang)
+  try {
+    const result = await service.delete(id, lang)
 
-  return NextResponse.json(result, {
-    status: isSuccessful(result) ? 200 : 410,
-  })
-} catch (err) {
-    logger.error(`Error at DELETE /contents: ${toString(err)}`)
+    return NextResponse.json(result, {
+      status: isSuccessful(result) ? 200 : 410,
+    })
+  } catch (err) {
+    logger.error(`Error at DELETE /contents: ${err}`)
 
     return new NextResponse("Internal Server Error", {
       status: 500,

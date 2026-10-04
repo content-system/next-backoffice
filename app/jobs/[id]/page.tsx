@@ -1,7 +1,7 @@
 import { BackButton } from "@components/client"
 import DeleteButton from "@components/delete-button"
 import { Error } from "@components/error"
-import { logger, toString } from "@lib/logger"
+import { logger } from "@lib/logger"
 import { getDateFormat, getLang, getResource } from "@resources"
 import { getJobService } from "@service/job"
 import { headers } from "next/headers"
@@ -135,7 +135,7 @@ export default async function Job({
     const headerList = await headers()
     const pathname = headerList.get("x-current-path")
 
-    logger.error(`Error at ${pathname}: ${toString(err)}`)
+    logger.error(`Error at ${pathname}: ${err}`)
 
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
