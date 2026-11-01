@@ -8,10 +8,7 @@ import { validate } from "validation-core"
 export async function POST(req: NextRequest) {
   const account = await getCurrentUser()
   if (!account) {
-    return new NextResponse("Require authentication", {
-      status: 401,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "Require authentication" }, { status: 401 })
   }
   const resource = getResource(account.language)
   const settings: Settings = await req.json()

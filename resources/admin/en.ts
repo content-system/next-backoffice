@@ -24,6 +24,8 @@ export const en = {
   role_system_role: "System Role",
   module: "Module",
 
+  check_all: "Check All",
+
   all_privileges: "All Privileges",
 
   role_assigned_users: "Assigned Users",

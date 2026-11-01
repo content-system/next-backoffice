@@ -1,12 +1,13 @@
 import { BackButton } from "@components/client"
-import { formatText } from "@components/client-script"
 import { Error } from "@components/error"
 import { Input, phoneOnFocus, SubmitButton } from "@components/form"
+import { formatText } from "@components/ui"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
 import { email, Gender, getResource, Status } from "@resources"
 import { getUserService, User } from "@service/user"
+import Link from "next/link"
 import { create, formatPhone, read, write } from "web-one"
 
 export default async function UserForm({ params }: { params: Promise<{ id: string }> }) {
@@ -70,6 +71,9 @@ export default async function UserForm({ params }: { params: Promise<{ id: strin
         <header>
           <BackButton id="backBtn" name="backBtn" className="btn-back" />
           <h2>{resource.user}</h2>
+          <Link href={`/users/${id}/assign`} className="btn-right" prefetch={false}>
+            <i className="material-icons">group</i>
+          </Link>
         </header>
         <div className="row">
           <label className="col s12 m6 required">

@@ -10,17 +10,11 @@ import { isSuccessful, write } from "web-one"
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const account = await getCurrentUser()
   if (!account) {
-    return new NextResponse("Require authentication", {
-      status: 401,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "Require authentication" }, { status: 401 })
   }
   const canWrite = await hasPermission(write, 1)
   if (!canWrite) {
-    return new NextResponse("You have no permission to create or update role", {
-      status: 403,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "You have no permission to create or update role" }, { status: 403 })
   }
   const { id } = await params
   const resource = getResource(account.language)

@@ -6,14 +6,12 @@ import {
   addClass,
   addErrorMessage,
   addRequiredError,
-  alertError,
   checkMax,
   checkMin,
   decode,
   digitKeyDown,
   formatInteger,
   formatNumber,
-  formatText,
   getContainer,
   getDecimals,
   getDecimalSeparator,
@@ -21,7 +19,6 @@ import {
   getIntegerError,
   getLabel,
   getRequiredError,
-  hideLoading,
   integerKeyDown,
   isValidPattern,
   normalizeInteger,
@@ -31,12 +28,10 @@ import {
   removeClasses,
   removeError,
   removeSeparators,
-  showConfirm,
   showFormError,
-  showLoading,
-  toast,
   validateForm,
 } from "./client-script"
+import { alertError, formatText, hideLoading, showConfirm, showLoading, toast } from "./ui"
 
 interface SubmitProps {
   id?: string

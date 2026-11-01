@@ -15,7 +15,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="apple-touch-icon" href="../public/logo192.png" />
         <title>Next App</title>
       </head>
-      <body id="sysBody" className="full-header">
+      <body id="sysBody" className="full-header" suppressHydrationWarning>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="sysToast" className="toast-message alert-success"></div>
         <div id="sysLoading" className="loader-wrapper" style={{ display: "none" }}>

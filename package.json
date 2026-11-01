@@ -11,19 +11,19 @@
   "dependencies": {
     "authen-service": "^0.4.5",
     "bcryptjs": "^3.0.3",
-    "config-plus": "^0.1.1",
+    "config-plus": "^0.1.2",
     "jsonwebtoken": "^9.0.3",
-    "locale-service": "^0.3.3",
-    "logger-core": "^0.5.2",
+    "locale-service": "^0.3.4",
+    "logger-core": "^0.5.3",
     "nanoid": "^3.3.4",
-    "next": "16.3.5",
-    "onecore": "^0.6.7",
-    "pg": "^8.23.0",
-    "postgres-kit": "^0.0.7",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "next": "16.4.2",
+    "onecore": "^0.6.15",
+    "pg": "^8.23.1",
+    "postgres-kit": "^0.0.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "script-plus": "^0.0.6",
-    "sql-core": "^0.1.10",
+    "sql-core": "^0.1.14",
     "validation-core": "^1.1.1",
     "web-one": "^0.1.3"
   },
@@ -34,7 +34,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.4",
-    "eslint-config-next": "16.3.5",
+    "eslint-config-next": "16.4.2",
     "typescript": "^6.0.3"
   }
 }

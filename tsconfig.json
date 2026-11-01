@@ -17,15 +17,13 @@
         "name": "next"
       }
     ],
-    "baseUrl": "./",
-    "ignoreDeprecations": "6.0",
     "paths": {
-      "@assets/*": ["assets/*"],
-      "@components/*": ["components/*"],
-      "@service": ["service/index"],
-      "@service/*": ["service/*"],
-      "@resources": ["resources/index"],
-      "@lib/*": ["lib/*"]
+      "@assets/*": ["./assets/*"],
+      "@components/*": ["./components/*"],
+      "@service": ["./service/index"],
+      "@service/*": ["./service/*"],
+      "@resources": ["./resources/index"],
+      "@lib/*": ["./lib/*"]
     },
     "target": "ES2015"
   },
