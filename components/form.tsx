@@ -2,36 +2,10 @@
 
 import { useRouter } from "next/navigation"
 import { FocusEvent, FocusEventHandler, KeyboardEvent, MouseEvent, ReactNode } from "react"
-import {
-  addClass,
-  addErrorMessage,
-  addRequiredError,
-  checkMax,
-  checkMin,
-  decode,
-  digitKeyDown,
-  formatInteger,
-  formatNumber,
-  getContainer,
-  getDecimals,
-  getDecimalSeparator,
-  getGroupSeparator,
-  getIntegerError,
-  getLabel,
-  getRequiredError,
-  integerKeyDown,
-  isValidPattern,
-  normalizeInteger,
-  normalizeNumber,
-  normalizePhone,
-  numberKeyDown,
-  removeClasses,
-  removeError,
-  removeSeparators,
-  showFormError,
-  validateForm,
-} from "./client-script"
-import { alertError, formatText, hideLoading, showConfirm, showLoading, toast } from "./ui"
+import { addErrorMessage, decode, getLabel, getRequiredError, isValidPattern, normalizePhone, removeError, showFormError, validateForm } from "./client-script"
+import { formatText } from "./format-text"
+import { materialOnBlur, materialOnFocus } from "./react-material"
+import { alertError, hideLoading, showConfirm, showLoading, toast } from "./ui"
 
 interface SubmitProps {
   id?: string
@@ -214,22 +188,6 @@ export function Input({
   )
 }
 
-export function digitOnKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-  if (!digitKeyDown(e.nativeEvent)) {
-    e.preventDefault()
-  }
-}
-export function integerOnKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-  if (!integerKeyDown(e.nativeEvent)) {
-    e.preventDefault()
-  }
-}
-export function numberOnKeyDown(e: KeyboardEvent<HTMLInputElement>, decimalSeparator?: "." | "," | "٫") {
-  if (!numberKeyDown(e.nativeEvent, decimalSeparator)) {
-    e.preventDefault()
-  }
-}
-
 export function checkOnBlur(e: FocusEvent<HTMLInputElement>, required?: boolean, requiredError?: string, patern?: string, paternError?: string) {
   materialOnBlur(e)
   const input = e.target
@@ -272,113 +230,6 @@ export function checkRequiredAndPatern(e: FocusEvent<HTMLInputElement>, msg?: st
   }
 }
 
-export function integerOnFocus(e: FocusEvent<HTMLInputElement>) {
-  materialOnFocus(e)
-  const v = normalizeInteger(e.target.value)
-  if (e.target.value !== v) {
-    e.target.value = v
-  }
-}
-export function integerOnBlur(e: FocusEvent<HTMLInputElement>) {
-  validateIntegerOnBlur(e)
-}
-export function integerOnBlurAndFormat(e: FocusEvent<HTMLInputElement>) {
-  const ele = e.currentTarget as HTMLInputElement
-  const groupSeparator = getGroupSeparator(ele)
-  validateIntegerOnBlur(e, groupSeparator)
-}
-export function validateIntegerOnBlur(e: FocusEvent<HTMLInputElement>, groupSeparator?: string | null) {
-  materialOnBlur(e)
-  removeError(e.target)
-  const ele = e.currentTarget as HTMLInputElement
-  const label = getLabel(ele)
-  if (ele.required && !ele.value) {
-    return addRequiredError(ele, label)
-  }
-  if (ele.value) {
-    const n0 = normalizeInteger(ele.value)
-    if (isNaN(n0 as any)) {
-      const errorFormat = getIntegerError(ele)
-      const msg = formatText(errorFormat, label)
-      addErrorMessage(ele, msg)
-    } else {
-      const n = parseFloat(n0)
-      checkMin(ele, label, n)
-      checkMax(ele, label, n)
-      const format = groupSeparator ? formatInteger(n, groupSeparator) : n.toString()
-      if (ele.value !== format) {
-        ele.value = format
-      }
-    }
-  }
-}
-export function numberOnFocus(e: FocusEvent<HTMLInputElement>) {
-  materialOnFocus(e)
-  const decimalSeparator = getDecimalSeparator(e.target)
-  const v = e.target.value
-  const n = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(v) : removeSeparators(v)
-  if (e.target.value !== n) {
-    e.target.value = n
-  }
-}
-export function numberOnBlur(e: FocusEvent<HTMLInputElement>) {
-  materialOnBlur(e)
-  removeError(e.target)
-  const ele = e.currentTarget as HTMLInputElement
-  const label = getLabel(ele)
-  if (ele.required && !ele.value) {
-    return addRequiredError(ele, label)
-  }
-  if (ele.value) {
-    const decimalSeparator = getDecimalSeparator(ele)
-    const n0 = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(ele.value) : removeSeparators(ele.value)
-    if (isNaN(n0 as any)) {
-      const errorFormat = getIntegerError(ele)
-      const msg = formatText(errorFormat, label)
-      addErrorMessage(ele, msg)
-    } else {
-      const n = parseFloat(n0)
-      checkMin(ele, label, n)
-      checkMax(ele, label, n)
-      const decimals = getDecimals(ele)
-      let format = decimals < 0 ? n.toString() : n.toFixed()
-      if (decimalSeparator === "," || decimalSeparator === "٫") {
-        format = format.replace(decimalSeparator, ".")
-      }
-      if (ele.value !== format) {
-        ele.value = format
-      }
-    }
-  }
-}
-export function numberOnBlurAndFormat(e: FocusEvent<HTMLInputElement>) {
-  materialOnBlur(e)
-  removeError(e.target)
-  const ele = e.currentTarget as HTMLInputElement
-  const label = getLabel(ele)
-  if (ele.required && !ele.value) {
-    return addRequiredError(ele, label)
-  }
-  if (ele.value) {
-    const decimalSeparator = getDecimalSeparator(ele)
-    const n0 = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(ele.value) : removeSeparators(ele.value)
-    if (isNaN(n0 as any)) {
-      const errorFormat = getIntegerError(ele)
-      const msg = formatText(errorFormat, label)
-      addErrorMessage(ele, msg)
-    } else {
-      const n = parseFloat(n0)
-      checkMin(ele, label, n)
-      checkMax(ele, label, n)
-      const decimals = getDecimals(ele)
-      const groupSeparator = getGroupSeparator(ele)
-      const format = formatNumber(n, decimals, decimalSeparator, groupSeparator)
-      if (ele.value !== format) {
-        ele.value = format
-      }
-    }
-  }
-}
 export function phoneOnFocus(e: FocusEvent<HTMLInputElement>) {
   const v = normalizePhone(e.target.value)
   if (e.target.value !== v) {
@@ -392,23 +243,4 @@ export function inputOnFocus(e: FocusEvent<HTMLInputElement>) {
 export function requiredOnFocus(e: FocusEvent<HTMLInputElement>) {
   materialOnFocus(e)
   removeError(e.target)
-}
-export function materialOnFocus(e: FocusEvent<HTMLInputElement>) {
-  const ele = e.currentTarget as HTMLInputElement
-  if (ele.disabled || ele.readOnly) {
-    return
-  }
-  setTimeout(() => {
-    if (ele.nodeName === "INPUT" || ele.nodeName === "SELECT" || ele.nodeName === "TEXTAREA") {
-      addClass(getContainer(ele), "focused")
-    }
-  }, 0)
-}
-export function materialOnBlur(e: FocusEvent<HTMLInputElement>): void {
-  const ele = e.currentTarget as HTMLInputElement
-  setTimeout(() => {
-    if (ele.nodeName === "INPUT" || ele.nodeName === "SELECT" || ele.nodeName === "TEXTAREA") {
-      removeClasses(getContainer(ele), ["focused", "focus"])
-    }
-  }, 0)
 }

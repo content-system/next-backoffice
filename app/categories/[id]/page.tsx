@@ -1,14 +1,13 @@
-import { BackButton } from "@components/client"
-import { formatText } from "@components/client-script"
+import { BackButton } from "@components/back-button"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"
+import { formatText } from "@components/format-text"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
 import { getResource, Status } from "@resources"
 import { getCategoryService } from "@service/category"
 import { read, write } from "web-one"
-import DeleteButton from "./DeleteButton"
 
 export default async function CategoryForm({ params }: { params: Promise<{ id: string }> }) {
   const account = await getCurrentUser()
@@ -86,7 +85,6 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
           <BackButton id="backBtn" name="backBtn" className="btn-back" />
           <h2>{resource.categories}</h2>
         </header>
-
         <div className="row">
           <label className="col s12 m6 required">
             {resource.id}
@@ -101,7 +99,6 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
               placeholder={resource.id}
             />
           </label>
-
           <label className="col s12 m6 required">
             {resource.name}
             <Input
@@ -115,7 +112,6 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
               placeholder={resource.name}
             />
           </label>
-
           <label className="col s12 m6 required">
             {resource.path}
             <Input
@@ -129,7 +125,19 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
               placeholder={resource.path}
             />
           </label>
-
+          <label className="col s12 m6 required">
+            {resource.resource}
+            <Input
+              type="text"
+              id="resource"
+              name="resource"
+              defaultValue={category.resource}
+              maxLength={255}
+              required={true}
+              requiredError={formatText(resource.error_required, resource.resource)}
+              placeholder={resource.resource}
+            />
+          </label>
           <label className="col s12 m6 required">
             {resource.icon}
             <Input
@@ -143,52 +151,33 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
               placeholder={resource.icon}
             />
           </label>
-
-          <label className="col s12 m6">
-            {resource.resource}
-            <Input type="text" id="resource" name="resource" defaultValue={category.resource} maxLength={255} placeholder={resource.resource} />
-          </label>
-
-          <label className="col s12 m6">
-            {resource.parent}
-            <Input type="text" id="parent" name="parent" defaultValue={category.parent} maxLength={40} placeholder={resource.parent} />
-          </label>
-
           <label className="col s12 m6">
             {resource.type}
             <Input type="text" id="type" name="type" defaultValue={category.type} placeholder={resource.type} />
           </label>
-
+          <label className="col s12 m6">
+            {resource.parent}
+            <Input type="text" id="parent" name="parent" defaultValue={category.parent} maxLength={40} placeholder={resource.parent} />
+          </label>
           <label className="col s12 m6">
             {resource.sequence}
             <Input type="number" id="sequence" name="sequence" defaultValue={category.sequence} placeholder={String(category.sequence)} />
           </label>
+          <label className="col s12 m6">
+            {resource.status}
+            <div className="radio-group">
+              <label>
+                <input type="radio" id="active" name="status" value={Status.Active} defaultChecked={category.status === Status.Active} />
+                {resource.active}
+              </label>
+              <label>
+                <input type="radio" id="inactive" name="status" value={Status.Inactive} defaultChecked={category.status === Status.Inactive} />
+                {resource.inactive}
+              </label>
+            </div>
+          </label>
         </div>
-
-        <label className="col s12 m6">
-          {resource.status}
-          <div className="radio-group">
-            <label>
-              <input type="radio" id="active" name="status" value={Status.Active} defaultChecked={category.status === Status.Active} />
-              {resource.active}
-            </label>
-
-            <label>
-              <input type="radio" id="inactive" name="status" value={Status.Inactive} defaultChecked={category.status === Status.Inactive} />
-              {resource.inactive}
-            </label>
-          </div>
-        </label>
-
-        <footer
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <DeleteButton id={category.id} />
-
+        <footer>
           <SubmitButton
             type="submit"
             id="btnSubmit"

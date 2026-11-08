@@ -72,25 +72,25 @@ export default async function AuditLogsForm({ searchParams }: { searchParams: Pr
                 <thead>
                   <tr>
                     <th>{resource.number}</th>
-                    <th data-field="time">
+                    <th>
                       <SortLink id="timeSort" href={sort.time.url} type={sort.time.type} text={resource.audit_log_time} />
                     </th>
-                    <th data-field="resource">
+                    <th>
                       <SortLink id="resourceSort" href={sort.resource.url} type={sort.resource.type} text={resource.resource} />
                     </th>
-                    <th data-field="action">
+                    <th>
                       <SortLink id="actionSort" href={sort.action.url} type={sort.action.type} text={resource.action} />
                     </th>
-                    <th data-field="status">
+                    <th>
                       <SortLink id="statusSort" href={sort.status.url} type={sort.status.type} text={resource.status} />
                     </th>
-                    <th data-field="userId">
+                    <th>
                       <SortLink id="userIdSort" href={sort.userId.url} type={sort.userId.type} text={resource.audit_log_user} />
                     </th>
-                    <th data-field="ip">
+                    <th>
                       <SortLink id="ipSort" href={sort.ip.url} type={sort.ip.type} text={resource.ip} />
                     </th>
-                    <th data-field="remark">
+                    <th>
                       <SortLink id="remarkSort" href={sort.remark.url} type={sort.remark.type} text={resource.remark} />
                     </th>
                   </tr>

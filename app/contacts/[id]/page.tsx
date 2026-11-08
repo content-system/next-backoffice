@@ -1,5 +1,5 @@
-import { formatText } from "@components/client-script"
 import { Input } from "@components/form"
+import { formatText } from "@components/format-text"
 import { email, getLang, getResource } from "@resources"
 import { Contact } from "@service/contact"
 import { formatPhone } from "web-one"

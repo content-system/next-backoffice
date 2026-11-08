@@ -1,7 +1,7 @@
-import { BackButton } from "@components/client"
+import { BackButton } from "@components/back-button"
 import { Error } from "@components/error"
 import { Input, phoneOnFocus, SubmitButton } from "@components/form"
-import { formatText } from "@components/ui"
+import { formatText } from "@components/format-text"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
@@ -10,7 +10,7 @@ import { getUserService, User } from "@service/user"
 import Link from "next/link"
 import { create, formatPhone, read, write } from "web-one"
 
-export default async function UserForm({ params }: { params: Promise<{ id: string }> }) {
+export default async function UserPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const newMode = id === Status.New
   const account = await getCurrentUser()
@@ -159,20 +159,20 @@ export default async function UserForm({ params }: { params: Promise<{ id: strin
               placeholder={resource.phone}
             />
           </label>
+          <label className="col s12 m6">
+            {resource.status}
+            <div className="radio-group">
+              <label>
+                <input type="radio" id="active" name="status" value={Status.Active} defaultChecked={user.status === Status.Active} />
+                {resource.active}
+              </label>
+              <label>
+                <input type="radio" id="inactive" name="status" value={Status.Inactive} defaultChecked={user.status === Status.Inactive} />
+                {resource.inactive}
+              </label>
+            </div>
+          </label>
         </div>
-        <label className="col s12 m6">
-          {resource.status}
-          <div className="radio-group">
-            <label>
-              <input type="radio" id="active" name="status" value={Status.Active} defaultChecked={user.status === Status.Active} />
-              {resource.active}
-            </label>
-            <label>
-              <input type="radio" id="inactive" name="status" value={Status.Inactive} defaultChecked={user.status === Status.Inactive} />
-              {resource.inactive}
-            </label>
-          </div>
-        </label>
         <footer>
           <SubmitButton
             type="submit"

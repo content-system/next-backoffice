@@ -38,9 +38,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
   } catch (err) {
     logger.error(`Error at POST /roles/${id}: ${err}`)
-    return new NextResponse("Internal Server Error", {
-      status: 500,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
   }
 }

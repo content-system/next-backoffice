@@ -24,12 +24,13 @@ export const vi = {
   role_system_role: "Vai trò hệ thống",
   module: "Chức năng",
 
-  check_all: "Chọn tất cả",
-
   all_privileges: "Tất cả quyền",
 
   role_assigned_users: "Người dùng được gán",
   role_roles_assign_to_groups: "Vai trò được gán cho nhóm",
+
+  msg_confirm_assign_roles_to_user: "Bạn không gán vai trò nào cho người dùng này. Bạn có chắc chắn muốn lưu không?",
+  msg_confirm_assign_users_to_role: "Bạn không gán người dùng nào cho vai trò này. Bạn có chắc chắn muốn lưu không?",
 
   number: "Số",
   // Audit log

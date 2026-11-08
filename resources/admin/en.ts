@@ -24,12 +24,13 @@ export const en = {
   role_system_role: "System Role",
   module: "Module",
 
-  check_all: "Check All",
-
   all_privileges: "All Privileges",
 
   role_assigned_users: "Assigned Users",
   role_roles_assign_to_groups: "Role Assign To Group(s)",
+
+  msg_confirm_assign_roles_to_user: "You do not assign any role to this user. Are you sure you want to save?",
+  msg_confirm_assign_users_to_role: "You do not assign any user to this role. Are you sure you want to save?",
 
   number: "No.",
   // Audit log

@@ -1,4 +1,4 @@
-import { ButtonQ, InputQ, ToggleSearch } from "./client"
+import { ButtonQ, InputQ, ToggleSearch } from "./client-search"
 import { Limit } from "./limit"
 
 interface Props {

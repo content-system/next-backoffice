@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { StringMap } from "onecore"
-import { ClientNav, SubList, ToggleMenu } from "./client"
+import { ClientNav, SubList } from "./client-nav"
+import { ToggleMenu } from "./toggle-menu"
 
 export interface Props {
   items: MenuItem[]

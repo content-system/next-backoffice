@@ -1,4 +1,4 @@
-import { BackButton } from "@components/client"
+import { BackButton } from "@components/back-button"
 import DeleteButton from "@components/delete-button"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"

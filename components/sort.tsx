@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { SearchLink, ToggleDropdown } from "./client"
+import { SearchLink, ToggleDropdown } from "./search-link"
 
 interface SortProps {
   id?: string

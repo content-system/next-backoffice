@@ -1,4 +1,4 @@
-import { SearchLink, ToggleDropdown } from "./client"
+import { SearchLink, ToggleDropdown } from "./search-link"
 
 interface Props {
   search?: string

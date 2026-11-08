@@ -3,28 +3,28 @@ import { Pagination } from "@components/pagination"
 import Search from "@components/search"
 import { SortLink } from "@components/sort"
 import { getCurrentUser } from "@lib/account"
-import { hasPermission } from "@lib/authorizor"
-import { logForbidden, logger } from "@lib/logger"
+import { authorize, hasPrivilege } from "@lib/authorizor"
+import { logError, logForbidden } from "@lib/logger"
 import { defaultLimit, getDateFormat, getResource, limits } from "@resources"
 import { getJobService, JobFilter } from "@service/job"
 import Form from "next/form"
-import { headers } from "next/headers"
 import Link from "next/link"
-import { buildFilter, buildSortSearch, datetimeToString, formatDateTime, getOffset, read, removeLimit, removePage } from "web-one"
+import { buildFilter, buildSortSearch, datetimeToString, formatDateTime, getOffset, read, removeLimit, removePage, write } from "web-one"
 
-const fields = ["id", "title", "company", "location", "publishedAt"]
+const fields = ["id", "title", "company", "position", "quantity", "location", "publishedAt"]
 
-export default async function Jobs({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function JobsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
-  const canRead = await hasPermission(read)
+  const permission = await authorize()
+  const canRead = hasPrivilege(permission, read)
+  const canWrite = hasPrivilege(permission, write)
   if (!canRead) {
     logForbidden(account)
     return <Error title={resource.error_403_title} message={resource.error_403_message} />
   }
 
   const query = await searchParams
-
   const filter = buildFilter<JobFilter>(query, defaultLimit, ["publishedAt"])
   const service = getJobService()
   try {
@@ -39,12 +39,9 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
 
     return (
       <div>
-        <header className="page-header">
+        <header className="view-header">
           <h2>{resource.jobs}</h2>
-
-          <Link href="/jobs/new" className="btn-add">
-            +
-          </Link>
+          {canWrite && <Link href="/jobs/new" id="newBtn" className="btn-new" prefetch={false} />}
         </header>
         <div className="main-body">
           <Form id="jobsForm" name="jobsForm" className="form" noValidate={true} action="/jobs">
@@ -60,7 +57,6 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
                 maxLength={40}
                 placeholder={resource.keyword}
               />
-
               <Pagination className="col s12 l4 xl3" total={total} size={filter.limit} page={filter.page} search={search} />
             </section>
             <section className="row search-group advance-search" hidden>
@@ -92,48 +88,45 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
             <table className="table">
               <thead>
                 <tr>
-                  <th>No.</th>
-
-                  <th data-field="id">
-                    <SortLink id="idSort" href={tableSort.id.url} type={tableSort.id.type} text="ID" />
+                  <th>{resource.number}</th>
+                  <th>
+                    <SortLink id="idSort" href={tableSort.id.url} type={tableSort.id.type} text={resource.id} />
                   </th>
-
-                  <th data-field="title">
-                    <SortLink id="titleSort" href={tableSort.title.url} type={tableSort.title.type} text="Title" />
+                  <th>
+                    <SortLink id="titleSort" href={tableSort.title.url} type={tableSort.title.type} text={resource.title} />
                   </th>
-
-                  <th data-field="company">
-                    <SortLink id="companySort" href={tableSort.company.url} type={tableSort.company.type} text="Company" />
+                  <th>
+                    <SortLink id="publishedAtSort" href={tableSort.publishedAt.url} type={tableSort.publishedAt.type} text={resource.published_at} />
                   </th>
-
-                  <th data-field="location">
-                    <SortLink id="locationSort" href={tableSort.location.url} type={tableSort.location.type} text="Location" />
+                  <th>
+                    <SortLink id="companySort" href={tableSort.company.url} type={tableSort.company.type} text={resource.company} />
                   </th>
-
-                  <th data-field="publishedAt">
-                    <SortLink id="publishedAtSort" href={tableSort.publishedAt.url} type={tableSort.publishedAt.type} text="Published At" />
+                  <th>
+                    <SortLink id="positionSort" href={tableSort.position.url} type={tableSort.position.type} text={resource.position} />
+                  </th>
+                  <th>
+                    <SortLink id="quantitySort" href={tableSort.quantity.url} type={tableSort.quantity.type} text={resource.quantity} />
+                  </th>
+                  <th>
+                    <SortLink id="locationSort" href={tableSort.location.url} type={tableSort.location.type} text={resource.location} />
                   </th>
                 </tr>
               </thead>
-
               <tbody>
                 {list.map((job, i) => (
                   <tr key={job.id}>
-                    <td>{offset + i + 1}</td>
-
+                    <td className="text-right">{offset + i + 1}</td>
                     <td>{job.id}</td>
-
                     <td>
                       <Link href={`/jobs/${job.id}`} prefetch={false}>
                         {job.title}
                       </Link>
                     </td>
-
-                    <td>{job.company}</td>
-
-                    <td>{job.location}</td>
-
                     <td>{formatDateTime(job.publishedAt, dateFormat)}</td>
+                    <td>{job.company}</td>
+                    <td>{job.position}</td>
+                    <td className="text-right">{job.quantity}</td>
+                    <td>{job.location}</td>
                   </tr>
                 ))}
               </tbody>
@@ -143,9 +136,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<Rec
       </div>
     )
   } catch (err) {
-    const headerList = await headers()
-    const pathname = headerList.get("x-current-path")
-    logger.error(`Error at ${pathname}: ${err}`)
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

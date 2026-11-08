@@ -13,7 +13,7 @@ import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage,
 
 const fields = ["userId", "username", "email", "displayName", "status"]
 
-export default async function UsersForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function UsersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
   const permission = await authorize()
@@ -69,19 +69,19 @@ export default async function UsersForm({ searchParams }: { searchParams: Promis
               <thead>
                 <tr>
                   <th>{resource.number}</th>
-                  <th data-field="userId">
+                  <th>
                     <SortLink id="userIdSort" href={sort.userId.url} type={sort.userId.type} text={resource.user_id} />
                   </th>
-                  <th data-field="username">
+                  <th>
                     <SortLink id="usernameSort" href={sort.username.url} type={sort.username.type} text={resource.username} />
                   </th>
-                  <th data-field="email">
+                  <th>
                     <SortLink id="emailSort" href={sort.email.url} type={sort.email.type} text={resource.email} />
                   </th>
-                  <th data-field="displayName">
+                  <th>
                     <SortLink id="displayNameSort" href={sort.displayName.url} type={sort.displayName.type} text={resource.display_name} />
                   </th>
-                  <th data-field="status">
+                  <th>
                     <SortLink id="statusSort" href={sort.status.url} type={sort.status.type} text={resource.status} />
                   </th>
                 </tr>

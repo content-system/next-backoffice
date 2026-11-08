@@ -13,7 +13,7 @@ import { buildFilter, buildSortSearch, getOffset, read, removeLimit, removePage,
 
 const fields = ["roleId", "roleName", "remark", "status"]
 
-export default async function RolesForm({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function RolesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
   const permission = await authorize()
@@ -63,16 +63,16 @@ export default async function RolesForm({ searchParams }: { searchParams: Promis
               <thead>
                 <tr>
                   <th>{resource.number}</th>
-                  <th data-field="roleId">
+                  <th>
                     <SortLink id="roleIdSort" href={sort.roleId.url} type={sort.roleId.type} text={resource.role_id} />
                   </th>
-                  <th data-field="roleName">
+                  <th>
                     <SortLink id="roleNameSort" href={sort.roleName.url} type={sort.roleName.type} text={resource.role_name} />
                   </th>
-                  <th data-field="remark">
+                  <th>
                     <SortLink id="remarkSort" href={sort.remark.url} type={sort.remark.type} text={resource.remark} />
                   </th>
-                  <th data-field="status">
+                  <th>
                     <SortLink id="statusSort" href={sort.status.url} type={sort.status.type} text={resource.status} />
                   </th>
                 </tr>

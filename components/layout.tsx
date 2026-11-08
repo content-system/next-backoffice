@@ -4,7 +4,7 @@ import { getMenu } from "@lib/menu"
 import { getDefaultLang, getResource } from "@resources"
 import { headers } from "next/headers"
 import { MenuItem, rebuildPath } from "web-one"
-import { ClientLayout } from "./client"
+import { ClientLayout } from "./client-layout"
 import PageHeader from "./page-header"
 
 export default async function LayoutPage({ children }: { children: React.ReactNode }) {

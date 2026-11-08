@@ -1,5 +1,4 @@
-import { BackButton } from "@components/client"
-import { formatText } from "@components/client-script"
+import { BackButton } from "@components/back-button"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"
 import { getCurrentUser } from "@lib/account"
@@ -18,156 +17,94 @@ export default async function NewContent() {
     return <Error title={resource.error_403_title} message={resource.error_403_message} />
   }
 
-const service = getContentService()
-try {
-  const content = {
-    id: "",
-    lang: account?.language || "en",
-    title: "",
-    body: "",
-    tags: [],
-    status: Status.Active,
-  }
-  const canWrite = hasPrivilege(permission, write)
+  const service = getContentService()
+  try {
+    const content = {
+      id: "",
+      lang: account?.language || "en",
+      title: "",
+      body: "",
+      tags: [],
+      status: Status.Active,
+    }
+    const canWrite = hasPrivilege(permission, write)
 
-  if (!canWrite) {
+    if (!canWrite) {
+      return (
+        <form id="contentForm" name="contentForm" className="form" noValidate={true}>
+          <header>
+            <h2>{resource.content}</h2>
+          </header>
+
+          {/* Chỗ này sẽ đổi theo model Content */}
+
+          <footer>
+            <BackButton type="submit" id="closeBtn" name="closeBtn">
+              {resource.close}
+            </BackButton>
+          </footer>
+        </form>
+      )
+    }
     return (
-      <form id="contentForm" name="contentForm" className="form" noValidate={true}>
+      <form id="contentForm" name="contentForm" className="form" noValidate={true} data-required-error={resource.error_required}>
         <header>
+          <BackButton id="backBtn" name="backBtn" className="btn-back" />
           <h2>{resource.content}</h2>
         </header>
 
-        {/* Chỗ này sẽ đổi theo model Content */}
+        <div className="row">
+          <label className="col s12 m6 required">
+            ID
+            <Input type="text" id="id" name="id" defaultValue={content.id} maxLength={40} required={true} placeholder="ID" />
+          </label>
+
+          <label className="col s12 m6 required">
+            Language
+            <Input type="text" id="lang" name="lang" defaultValue={content.lang} maxLength={40} required={true} placeholder="Language" />
+          </label>
+
+          <label className="col s12 required">
+            Title
+            <Input type="text" id="title" name="title" defaultValue={content.title} maxLength={255} required={true} placeholder="Title" />
+          </label>
+
+          <div className="col s12 required">
+            <label htmlFor="body">Body</label>
+            <textarea id="body" name="body" defaultValue={content.body} rows={10} style={{ width: "100%", minHeight: "220px" }} />
+          </div>
+
+          <label className="col s12">
+            Tags
+            <Input type="text" id="tags" name="tags" defaultValue={content.tags?.join(",")} placeholder="tag1,tag2" />
+          </label>
+
+          <div className="col s12">
+            <label>{resource.status}</label>
+
+            <div className="radio-group">
+              <label>
+                <input type="radio" name="status" value={Status.Active} defaultChecked={content.status === Status.Active} />
+                {resource.active}
+              </label>
+
+              <label>
+                <input type="radio" name="status" value={Status.Inactive} defaultChecked={content.status === Status.Inactive} />
+                {resource.inactive}
+              </label>
+            </div>
+          </div>
+        </div>
 
         <footer>
-          <BackButton type="submit" id="closeBtn" name="closeBtn">
-            {resource.close}
-          </BackButton>
+          <SubmitButton type="submit" id="btnSubmit" name="btnSubmit" api="/api/contents/create">
+            {resource.submit}
+          </SubmitButton>
         </footer>
       </form>
     )
+  } catch (err) {
+    logError(err)
+    return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
-    return (
-  <form
-    id="contentForm"
-    name="contentForm"
-    className="form"
-    noValidate={true}
-    data-required-error={resource.error_required}
-  >
-    <header>
-      <BackButton id="backBtn" name="backBtn" className="btn-back" />
-      <h2>{resource.content}</h2>
-    </header>
-
-    <div className="row">
-      <label className="col s12 m6 required">
-        ID
-        <Input
-          type="text"
-          id="id"
-          name="id"
-          defaultValue={content.id}
-          maxLength={40}
-          required={true}
-          placeholder="ID"
-        />
-      </label>
-
-      <label className="col s12 m6 required">
-        Language
-        <Input
-          type="text"
-          id="lang"
-          name="lang"
-          defaultValue={content.lang}
-          maxLength={40}
-          required={true}
-          placeholder="Language"
-        />
-      </label>
-
-      <label className="col s12 required">
-        Title
-        <Input
-          type="text"
-          id="title"
-          name="title"
-          defaultValue={content.title}
-          maxLength={255}
-          required={true}
-          placeholder="Title"
-        />
-      </label>
-
-            <div className="col s12 required">
-        <label htmlFor="body">Body</label>
-        <textarea
-          id="body"
-          name="body"
-          defaultValue={content.body}
-          rows={10}
-          style={{ width: "100%", minHeight: "220px" }}
-        />
-      </div>
-
-      <label className="col s12">
-        Tags
-        <Input
-          type="text"
-          id="tags"
-          name="tags"
-          defaultValue={content.tags?.join(",")}
-          placeholder="tag1,tag2"
-        />
-      </label>
-
-      <div className="col s12">
-        <label>{resource.status}</label>
-
-        <div className="radio-group">
-          <label>
-            <input
-              type="radio"
-              name="status"
-              value={Status.Active}
-              defaultChecked={content.status === Status.Active}
-            />
-            {resource.active}
-          </label>
-
-          <label>
-            <input
-              type="radio"
-              name="status"
-              value={Status.Inactive}
-              defaultChecked={content.status === Status.Inactive}
-            />
-            {resource.inactive}
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      <SubmitButton
-        type="submit"
-        id="btnSubmit"
-        name="btnSubmit"
-        api="/api/contents/create"
-      >
-        {resource.submit}
-      </SubmitButton>
-    </footer>
-  </form>
-)
-} catch (err) {
-  logError(err)
-  return (
-    <Error
-      title={resource.error_500_title}
-      message={resource.error_500_message}
-    />
-  )
-}
 }

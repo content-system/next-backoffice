@@ -66,19 +66,19 @@ export default async function ContactsForm({ searchParams }: { searchParams: Pro
               <thead>
                 <tr>
                   <th>{resource.number}</th>
-                  <th data-field="name">
+                  <th>
                     <SortLink id="nameSort" href={sort.name.url} type={sort.name.type} text={resource.fullname} />
                   </th>
-                  <th data-field="email">
+                  <th>
                     <SortLink id="emailSort" href={sort.email.url} type={sort.email.type} text={resource.email} />
                   </th>
-                  <th data-field="phone">
+                  <th>
                     <SortLink id="phoneSort" href={sort.phone.url} type={sort.phone.type} text={resource.phone} />
                   </th>
-                  <th data-field="company">
+                  <th>
                     <SortLink id="companySort" href={sort.company.url} type={sort.company.type} text={resource.company} />
                   </th>
-                  <th data-field="country">
+                  <th>
                     <SortLink id="countrySort" href={sort.country.url} type={sort.country.type} text={resource.country} />
                   </th>
                 </tr>
