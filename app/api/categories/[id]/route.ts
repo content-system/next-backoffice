@@ -7,20 +7,14 @@ import { NextRequest, NextResponse } from "next/server"
 import { validate } from "validation-core"
 import { isSuccessful, write } from "web-one"
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const account = await getCurrentUser()
   if (!account) {
-    return new NextResponse("Require authentication", {
-      status: 401,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "Require authentication" }, { status: 401 })
   }
   const canWrite = await hasPermission(write, 1)
   if (!canWrite) {
-    return new NextResponse("You have no permission to create or update category", {
-      status: 403,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "You have no permission to create or update category" }, { status: 403 })
   }
   const { id } = await params
   const resource = getResource(account.language)
@@ -44,43 +38,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
   } catch (err) {
     logger.error(`Error at POST /categorys/${id}: ${err}`)
-    return new NextResponse("Internal Server Error", {
-      status: 500,
-      headers: { "Content-Type": "text/plain" },
-    })
-  }
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const account = await getCurrentUser()
-
-  if (!account) {
-    return new NextResponse("Require authentication", {
-      status: 401,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    })
-  }
-
-  const { id } = await params
-
-  const service = getCategoryService()
-
-  try {
-    const result = await service.delete(id)
-
-    return NextResponse.json(result, {
-      status: result > 0 ? 200 : 410,
-    })
-  } catch (err) {
-    logger.error(`Error at DELETE /categories/${id}: ${err}`)
-
-    return new NextResponse("Internal Server Error", {
-      status: 500,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    })
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
   }
 }

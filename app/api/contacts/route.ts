@@ -9,10 +9,7 @@ import { isSuccessful } from "web-one"
 export async function POST(req: NextRequest) {
   const account = await getCurrentUser()
   if (!account) {
-    return new NextResponse("Require authentication", {
-      status: 401,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ message: "Require authentication" }, { status: 401 })
   }
   const resource = getResource(account.language)
   const contact: Contact = await req.json()
@@ -29,9 +26,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(res, { status })
   } catch (err) {
     logger.error(`Error at POST /contacts: ${err}`)
-    return new NextResponse("Internal Server Error", {
-      status: 500,
-      headers: { "Content-Type": "text/plain" },
-    })
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
   }
 }
