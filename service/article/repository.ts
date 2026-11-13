@@ -7,6 +7,13 @@ export class SqlDraftArticleRepository extends Repository<Article, string, Artic
   constructor(db: DB) {
     super(db, "draft_articles", articleModel, buildQuery)
   }
+  async getTags(): Promise<string[]> {
+    const tags = await this.db.query<{ tag: string }>(
+      "select tag from (select unnest(tags) as tag from draft_articles where tags is not null union select unnest(tags) as tag from articles where tags is not null) as all_tags where tag is not null order by tag",
+      [],
+    )
+    return tags.map(({ tag }) => tag)
+  }
 }
 export class SqlArticleRepository extends SqlViewRepository<Article, string> implements ArticleRepository {
   constructor(protected db: DB) {

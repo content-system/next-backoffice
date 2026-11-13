@@ -7,6 +7,13 @@ export class SqlJobRepository extends Repository<Job, string, JobFilter> impleme
   constructor(db: DB) {
     super(db, "jobs", jobModel, buildQuery)
   }
+  async getSkills(): Promise<string[]> {
+    const skills = await this.db.query<{ skill: string }>(
+      "select distinct skill from jobs cross join lateral unnest(skills) as skill where skill is not null order by skill",
+      [],
+    )
+    return skills.map(({ skill }) => skill)
+  }
 }
 
 export function buildQuery(filter: JobFilter): Statement {

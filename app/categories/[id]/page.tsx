@@ -1,7 +1,7 @@
 import { BackButton } from "@components/back-button"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"
-import { formatText } from "@components/format-text"
+import { formatText } from "@components/format"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
@@ -38,38 +38,28 @@ export default async function CategoryForm({ params }: { params: Promise<{ id: s
           <header>
             <h2>{resource.category}</h2>
           </header>
-
           <div>
             <dl className="data-list row">
               <dt className="col s6 l3">{resource.id}</dt>
               <dd className="col s6 l9">{category.id}</dd>
-
               <dt className="col s6 l3">{resource.name}</dt>
               <dd className="col s6 l9">{category.name}</dd>
-
               <dt className="col s6 l3">{resource.path}</dt>
               <dd className="col s6 l9">{category.path}</dd>
-
               <dt className="col s6 l3">{resource.icon}</dt>
               <dd className="col s6 l9">{category.icon}</dd>
-
               <dt className="col s6 l3">{resource.resource}</dt>
               <dd className="col s6 l9">{category.resource}</dd>
-
               <dt className="col s6 l3">{resource.parent}</dt>
               <dd className="col s6 l9">{category.parent}</dd>
-
               <dt className="col s6 l3">{resource.type}</dt>
               <dd className="col s6 l9">{category.type}</dd>
-
               <dt className="col s6 l3">{resource.sequence}</dt>
               <dd className="col s6 l9">{category.sequence}</dd>
-
               <dt className="col s6 l3">{resource.status}</dt>
               <dd className="col s6 l9">{category.status}</dd>
             </dl>
           </div>
-
           <footer>
             <BackButton type="submit" id="closeBtn" name="closeBtn">
               {resource.close}

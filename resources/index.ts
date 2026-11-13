@@ -46,6 +46,20 @@ export function getStatusName(status?: string, map?: StringMap): string | undefi
   }
   return statusNames.get(status)
 }
+export const flowStatusNames: Map<string, string> = new Map([
+  ["D", "Draft"],
+  ["S", "Submitted"],
+  ["R", "Rejected"],
+  ["A", "Approved"],
+  ["P", "Published"],
+  ["E", "Expired"],
+])
+export function getFlowStatusName(status?: string, map?: StringMap): string | undefined {
+  if (!status) {
+    return ""
+  }
+  return flowStatusNames.get(status)
+}
 
 export interface Resources {
   [key: string]: StringMap
@@ -55,13 +69,13 @@ const en: StringMap = {
   ...commonEN,
   ...authenticationEN,
   ...adminEN,
-  ...contentEN
+  ...contentEN,
 }
 const vi: StringMap = {
   ...commonVI,
   ...authenticationVI,
   ...adminVI,
-  ...contentVI
+  ...contentVI,
 }
 
 export const resources: Resources = {

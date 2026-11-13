@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { FocusEvent, FocusEventHandler, KeyboardEvent, MouseEvent, ReactNode } from "react"
 import { addErrorMessage, decode, getLabel, getRequiredError, isValidPattern, normalizePhone, removeError, showFormError, validateForm } from "./client-script"
-import { formatText } from "./format-text"
+import { formatText } from "./format"
 import { materialOnBlur, materialOnFocus } from "./react-material"
 import { alertError, hideLoading, showConfirm, showLoading, toast } from "./ui"
 

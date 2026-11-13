@@ -1,50 +1,84 @@
+import { AutocompleteChip } from "@components/autocomplete-chip"
 import { BackButton } from "@components/back-button"
-import DeleteButton from "@components/delete-button"
 import { Error } from "@components/error"
 import { Input, SubmitButton } from "@components/form"
+import { formatText } from "@components/format"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"
-import { getResource, Status } from "@resources"
-import { getArticleService } from "@service/article"
-import { read, write } from "web-one"
+import { getDateFormat, getResource, Status } from "@resources"
+import { Article, getArticleService } from "@service/article"
+import { Status as ArticleStatus, canUpdate } from "@service/shared/status"
+import { create, datetimeToString, formatDateTime, read, write } from "web-one"
 
-export default async function ArticleForm({ params }: { params: Promise<{ id: string }> }) {
+export default async function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const newMode = id === Status.New
   const account = await getCurrentUser()
   const resource = getResource(account?.language)
-
   const permission = await authorize(1)
+  const canRead = hasPrivilege(permission, read)
+  const canWrite = hasPrivilege(permission, write)
 
-  if (!hasPrivilege(permission, read)) {
+  if (!canRead || (newMode && !canWrite)) {
     logForbidden(account)
-
     return <Error title={resource.error_403_title} message={resource.error_403_message} />
   }
 
-  const { id } = await params
-
   const service = getArticleService()
-
   try {
-    const article = await service.loadDraft(id)
-
+    const tagSuggestions = await service.getTags()
+    let article: Article | null = newMode ? create<Article>(ArticleStatus.Draft) : await service.loadDraft(id)
+    const hasDraft = !!article
+    if (!article && !newMode) {
+      article = await service.load(id)
+    }
     if (!article) {
       logger.warn(`Article not found: ${id}`)
-
       return <Error title={resource.error_404_title} message={resource.error_404_message} />
     }
 
-    const canWrite = hasPrivilege(permission, write)
+    const canEdit = canWrite && (newMode || (hasDraft && canUpdate(article.status)))
+    const dateFormat = getDateFormat(account?.language, account?.dateFormat)
+    const statusText =
+      article.status === ArticleStatus.Draft
+        ? resource.save_draft
+        : article.status === ArticleStatus.Submitted
+          ? resource.submit
+          : article.status === ArticleStatus.Rejected
+            ? resource.rejected
+            : article.status === ArticleStatus.Approved
+              ? resource.approved
+              : article.status
 
-    if (!canWrite) {
+    if (!canEdit) {
       return (
-        <form className="form">
+        <form id="articleForm" name="articleForm" className="form" noValidate={true}>
           <header>
             <h2>{resource.article}</h2>
           </header>
-
+          <div>
+            <dl className="data-list row">
+              <dt className="col s6 l3">{resource.id}</dt>
+              <dd className="col s6 l9">{article.id}</dd>
+              <dt className="col s6 l3">{resource.title}</dt>
+              <dd className="col s6 l9">{article.title}</dd>
+              <dt className="col s6 l3">{resource.description}</dt>
+              <dd className="col s6 l9">{article.description}</dd>
+              <dt className="col s6 l3">{resource.content}</dt>
+              <dd className="col s6 l9">{article.content}</dd>
+              <dt className="col s6 l3">{resource.published_at}</dt>
+              <dd className="col s6 l9">{formatDateTime(article.publishedAt, dateFormat)}</dd>
+              <dt className="col s6 l3">{resource.tags}</dt>
+              <dd className="col s6 l9">{article.tags?.join(", ")}</dd>
+              <dt className="col s6 l3">{resource.thumbnail}</dt>
+              <dd className="col s6 l9">{article.thumbnail}</dd>
+              <dt className="col s6 l3">{resource.status}</dt>
+              <dd className="col s6 l9">{statusText}</dd>
+            </dl>
+          </div>
           <footer>
-            <BackButton id="closeBtn" name="closeBtn">
+            <BackButton type="submit" id="closeBtn" name="closeBtn">
               {resource.close}
             </BackButton>
           </footer>
@@ -53,138 +87,79 @@ export default async function ArticleForm({ params }: { params: Promise<{ id: st
     }
 
     return (
-      <form id="articleForm" name="articleForm" className="form" noValidate data-required-error={resource.error_required}>
-        {/* HEADER */}
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
+      <form id="articleForm" name="articleForm" className="form" noValidate={true} data-required-error={resource.error_required}>
+        <header>
           <BackButton id="backBtn" name="backBtn" className="btn-back" />
-
-          <h2
-            style={{
-              margin: 0,
-              flex: 1,
-            }}
-          >
-            {resource.article}
-          </h2>
-
-          <DeleteButton id={article.id} />
+          <h2>{resource.article}</h2>
         </header>
-
-        {/* FORM */}
+        <input type="hidden" id="id" name="id" value={article.id || id} />
         <div className="row">
-          <label className="col s12 m6 required">
-            ID
-            <Input id="id" name="id" type="text" defaultValue={article.id} required maxLength={40} />
+          <label className="col s12">
+            {resource.thumbnail}
+            <Input type="url" id="thumbnail" name="thumbnail" defaultValue={article.thumbnail} maxLength={400} placeholder={resource.thumbnail} />
           </label>
-
           <label className="col s12 m6">
-            Slug
-            <Input id="slug" name="slug" type="text" defaultValue={article.slug} maxLength={150} />
+            {resource.published_at}
+            <Input type="datetime-local" step=".010" id="publishedAt" name="publishedAt" defaultValue={datetimeToString(article.publishedAt)} />
           </label>
-
           <label className="col s12 required">
-            Title
-            <Input id="title" name="title" type="text" defaultValue={article.title} required maxLength={255} />
+            {resource.title}
+            <Input
+              type="text"
+              id="title"
+              name="title"
+              defaultValue={article.title}
+              maxLength={255}
+              required={true}
+              requiredError={formatText(resource.error_required, resource.title)}
+              placeholder={resource.title}
+            />
           </label>
-
-          <div className="col s12 required">
-            <label htmlFor="description">Description</label>
-
+          <label className="col s12 auto-height required">
+            {resource.description}
             <textarea
               id="description"
               name="description"
               defaultValue={article.description}
               rows={4}
-              style={{
-                width: "100%",
-              }}
-            />
-          </div>
-
-          <div className="col s12 required">
-            <label htmlFor="content">Content</label>
-
-            <textarea
-              id="content"
-              name="content"
-              defaultValue={article.content}
-              rows={12}
-              style={{
-                width: "100%",
-                minHeight: "260px",
-              }}
-            />
-          </div>
-
-          <label className="col s12">
-            Thumbnail
-            <Input id="thumbnail" name="thumbnail" type="text" defaultValue={article.thumbnail} maxLength={400} />
-          </label>
-
-          <label className="col s12">
-            High Thumbnail
-            <Input id="highThumbnail" name="highThumbnail" type="text" defaultValue={article.highThumbnail} maxLength={400} />
-          </label>
-
-          <label className="col s12 m6">
-            Author ID
-            <Input id="authorId" name="authorId" type="text" defaultValue={article.authorId} />
-          </label>
-
-          <label className="col s12 m6">
-            Published At
-            <Input
-              id="publishedAt"
-              name="publishedAt"
-              type="datetime-local"
-              defaultValue={article.publishedAt ? new Date(article.publishedAt).toISOString().substring(0, 16) : ""}
+              maxLength={1200}
+              required={true}
+              placeholder={resource.description}
             />
           </label>
-
-          <label className="col s12">
-            Tags
-            <Input id="tags" name="tags" type="text" defaultValue={article.tags?.join(",")} placeholder="tag1,tag2" />
+          <label className="col s12 m6 auto-height">
+            {resource.tags}
+            <AutocompleteChip id="tags" name="tags" values={article.tags} suggestions={tagSuggestions} placeholder={resource.tags} />
           </label>
-
-          <div className="col s12">
-            <label>{resource.status}</label>
-
+          <label className="col s12">
+            {resource.status}
             <div className="radio-group">
               <label>
-                <input type="radio" name="status" value={Status.Draft} defaultChecked={article.status === Status.Draft} />
-                Draft
+                <input
+                  type="radio"
+                  id="draft"
+                  name="status"
+                  value={ArticleStatus.Draft}
+                  defaultChecked={!article.status || article.status !== ArticleStatus.Submitted}
+                />
+                {resource.save_draft}
               </label>
-
               <label>
-                <input type="radio" name="status" value={Status.Submitted} defaultChecked={article.status === Status.Submitted} />
-                Submitted
-              </label>
-
-              <label>
-                <input type="radio" name="status" value={Status.Published} defaultChecked={article.status === Status.Published} />
-                Published
-              </label>
-
-              <label>
-                <input type="radio" name="status" value={Status.Rejected} defaultChecked={article.status === Status.Rejected} />
-                Rejected
+                <input type="radio" id="submitted" name="status" value={ArticleStatus.Submitted} defaultChecked={article.status === ArticleStatus.Submitted} />
+                {resource.submit}
               </label>
             </div>
-          </div>
+          </label>
+          <label className="col s12 auto-height required">
+            {resource.content}
+            <textarea id="content" name="content" defaultValue={article.content} rows={80} maxLength={9000} required={true} placeholder={resource.content} />
+          </label>
         </div>
-
-        {/* FOOTER */}
         <footer>
           <SubmitButton
+            type="submit"
             id="btnSubmit"
             name="btnSubmit"
-            type="submit"
             api={`/api/articles/${id}`}
             confirmHeader={resource.header_confirm}
             confirmMessage={resource.msg_confirm_save}
@@ -204,7 +179,6 @@ export default async function ArticleForm({ params }: { params: Promise<{ id: st
     )
   } catch (err) {
     logError(err)
-
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

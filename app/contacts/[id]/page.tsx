@@ -1,5 +1,5 @@
 import { Input } from "@components/form"
-import { formatText } from "@components/format-text"
+import { formatText } from "@components/format"
 import { email, getLang, getResource } from "@resources"
 import { Contact } from "@service/contact"
 import { formatPhone } from "web-one"
@@ -98,7 +98,7 @@ export default async function ContactForm({ searchParams }: { searchParams: Prom
             placeholder={resource.phone}
           />
         </label>
-        <label className="col s12 m12 textarea-container required">
+        <label className="col s12 m12 auto-height required">
           {resource.message}
           <textarea id="message" name="message" rows={6} defaultValue={contact.message} maxLength={400} placeholder={resource.message} />
         </label>

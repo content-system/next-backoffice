@@ -9,6 +9,39 @@
   gap: 0.5rem;
   padding-top: 4px;
 }
+.autocomplete-chip {
+  position: relative;
+}
+.autocomplete-chip > input {
+  width: 100%;
+}
+.autocomplete-chip-suggestions {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  border: 1px solid #ced4da;
+  background-color: inherit;
+}
+.autocomplete-chip-suggestions button {
+  width: 100%;
+  padding: 6px 10px;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.autocomplete-chip-suggestions button:hover,
+.autocomplete-chip-suggestions button:focus-visible {
+  background-color: rgba(128, 128, 128, 0.15);
+}
 .card > section.chip-list {
   margin: 16px;
   width: calc(100% - 32px);

@@ -14,7 +14,7 @@ import {
   removeError,
   removeSeparators,
 } from "./client-script"
-import { formatText } from "./format-text"
+import { formatText } from "./format"
 import { digitKeyDown, integerKeyDown, numberKeyDown } from "./number-client"
 import { materialOnBlur, materialOnFocus } from "./react-material"
 

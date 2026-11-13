@@ -1,7 +1,7 @@
 import { BackButton } from "@components/back-button"
 import { Error } from "@components/error"
 import { Input, phoneOnFocus, SubmitButton } from "@components/form"
-import { formatText } from "@components/format-text"
+import { formatText } from "@components/format"
 import { getCurrentUser } from "@lib/account"
 import { authorize, hasPrivilege } from "@lib/authorizor"
 import { logError, logForbidden, logger } from "@lib/logger"

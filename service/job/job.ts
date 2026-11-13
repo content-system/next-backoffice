@@ -1,9 +1,9 @@
 import { Attributes, Filter, SearchResult, TimeRange } from "onecore"
 
 export class Status {
-  static readonly Draft = 'D'
-  static readonly Submitted = 'S'
-  static readonly Approved = 'A'
+  static readonly Draft = "D"
+  static readonly Submitted = "S"
+  static readonly Approved = "A"
 }
 
 export interface Job {
@@ -46,6 +46,7 @@ export interface JobFilter extends Filter {
 }
 
 export interface JobRepository {
+  getSkills(): Promise<string[]>
   search(filter: JobFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Job>>
   load(id: string): Promise<Job | null>
   create(job: Job): Promise<number>
@@ -54,6 +55,7 @@ export interface JobRepository {
   delete(id: string): Promise<number>
 }
 export interface JobService {
+  getSkills(): Promise<string[]>
   search(filter: JobFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Job>>
   load(id: string): Promise<Job | null>
   create(job: Job): Promise<number>
@@ -131,6 +133,6 @@ export const jobModel: Attributes = {
   updatedAt: {
     column: "updated_at",
     type: "datetime",
-    updatedAt: true
+    updatedAt: true,
   },
 }

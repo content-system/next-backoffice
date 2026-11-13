@@ -5,6 +5,9 @@ import { Job, JobFilter, JobRepository, JobService, Status } from "./job"
 
 export class JobUseCase implements JobService {
   constructor(protected repository: JobRepository) {}
+  getSkills(): Promise<string[]> {
+    return this.repository.getSkills()
+  }
   search(filter: JobFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Job>> {
     return this.repository.search(filter, limit, page, fields)
   }

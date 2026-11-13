@@ -1,142 +1,184 @@
+import { AutocompleteChip } from "@components/autocomplete-chip"
 import { BackButton } from "@components/back-button"
-import DeleteButton from "@components/delete-button"
 import { Error } from "@components/error"
-import { logger } from "@lib/logger"
-import { getDateFormat, getLang, getResource } from "@resources"
-import { getJobService } from "@service/job"
-import { headers } from "next/headers"
-import Link from "next/link"
-import { formatDateTime } from "web-one"
+import { Input, SubmitButton } from "@components/form"
+import { getCurrentUser } from "@lib/account"
+import { authorize, hasPrivilege } from "@lib/authorizor"
+import { logError, logForbidden, logger } from "@lib/logger"
+import { getDateFormat, getResource, Status } from "@resources"
+import { getJobService, Job } from "@service/job"
+import { datetimeToString, formatDateTime, read, write } from "web-one"
 
-export default async function Job({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const query = await searchParams
-  const lang = getLang(query)
-  const resource = getResource(lang)
+export default async function JobPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const newMode = id === Status.New
+  const account = await getCurrentUser()
+  const resource = getResource(account?.language)
+  const permission = await authorize(1)
+  const canRead = hasPrivilege(permission, read)
+  const canWrite = hasPrivilege(permission, write)
+
+  if (!canRead || (newMode && !canWrite)) {
+    logForbidden(account)
+    return <Error title={resource.error_403_title} message={resource.error_403_message} />
+  }
 
   const service = getJobService()
-
   try {
-    const job = await service.load(id)
-
-    if (!job) {
-      logger.warn(`Job not found: ${id}`)
-      return <Error title={resource.error_404_title} message={resource.error_404_message} />
+    let job: Job | null = null
+    if (!newMode) {
+      job = await service.load(id)
+      if (!job) {
+        logger.warn(`Job not found: ${id}`)
+        return <Error title={resource.error_404_title} message={resource.error_404_message} />
+      }
     }
 
-    const dateFormat = getDateFormat(lang)
+    const dateFormat = getDateFormat(account?.language, account?.dateFormat)
+
+    if (!canWrite) {
+      return (
+        <form id="jobForm" name="jobForm" className="form" noValidate={true}>
+          <header>
+            <h2>{resource.job}</h2>
+          </header>
+          <div>
+            <dl className="data-list row">
+              <dt className="col s6 l3">{resource.id}</dt>
+              <dd className="col s6 l9">{job?.id}</dd>
+              <dt className="col s6 l3">{resource.title}</dt>
+              <dd className="col s6 l9">{job?.title}</dd>
+              <dt className="col s6 l3">{resource.description}</dt>
+              <dd className="col s6 l9">{job?.description}</dd>
+              <dt className="col s6 l3">{resource.published_at}</dt>
+              <dd className="col s6 l9">{formatDateTime(job?.publishedAt, dateFormat)}</dd>
+              <dt className="col s6 l3">{resource.end_date}</dt>
+              <dd className="col s6 l9">{formatDateTime(job?.expiredAt, dateFormat)}</dd>
+              <dt className="col s6 l3">{resource.company}</dt>
+              <dd className="col s6 l9">{job?.company}</dd>
+              <dt className="col s6 l3">{resource.position}</dt>
+              <dd className="col s6 l9">{job?.position}</dd>
+              <dt className="col s6 l3">{resource.quantity}</dt>
+              <dd className="col s6 l9">{job?.quantity}</dd>
+              <dt className="col s6 l3">{resource.location}</dt>
+              <dd className="col s6 l9">{job?.location}</dd>
+              <dt className="col s6 l3">{resource.min_salary}</dt>
+              <dd className="col s6 l9">{job?.minSalary}</dd>
+              <dt className="col s6 l3">{resource.max_salary}</dt>
+              <dd className="col s6 l9">{job?.maxSalary}</dd>
+            </dl>
+          </div>
+          <footer>
+            <BackButton type="submit" id="closeBtn" name="closeBtn">
+              {resource.close}
+            </BackButton>
+          </footer>
+        </form>
+      )
+    }
+
+    const skillSuggestions = await service.getSkills()
 
     return (
-      <article className="article">
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+      <form id="jobForm" name="jobForm" className="form" noValidate={true} data-required-error={resource.error_required}>
+        <header>
           <BackButton id="backBtn" name="backBtn" className="btn-back" />
-
-          <h2 style={{ flex: 1 }}>{job.title}</h2>
-
-          <div style={{ display: "flex", gap: "12px" }}>
-            <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
-
-            <DeleteButton id={job.id} />
-          </div>
+          <h2>{resource.job}</h2>
         </header>
-
-        <div className="article-body">
-          <p>
-            <strong>ID:</strong> {job.id}
-          </p>
-
-          <p>
-            <strong>Slug:</strong> {job.slug}
-          </p>
-
-          <p>
-            <strong>Company:</strong> {job.company}
-          </p>
-
-          <p>
-            <strong>Position:</strong> {job.position}
-          </p>
-
-          <p>
-            <strong>Location:</strong> {job.location}
-          </p>
-
-          <p>
-            <strong>Quantity:</strong> {job.quantity}
-          </p>
-
-          <p>
-            <strong>Min Salary:</strong> {job.minSalary}
-          </p>
-
-          <p>
-            <strong>Max Salary:</strong> {job.maxSalary}
-          </p>
-
-          <p>
-            <strong>Status:</strong> {job.status}
-          </p>
-
-          <p>
-            <strong>Skills:</strong> {job.skills?.join(", ")}
-          </p>
-
-          <p>
-            <strong>Published At:</strong> {formatDateTime(job.publishedAt, dateFormat)}
-          </p>
-
-          <p>
-            <strong>Expired At:</strong> {formatDateTime(job.expiredAt, dateFormat)}
-          </p>
-
-          <hr />
-
-          <h3>Description</h3>
-
-          <div
-            className="job-description"
-            dangerouslySetInnerHTML={{
-              __html: job.description,
-            }}
-          />
-
-          <hr />
-
-          <p>
-            <strong>Created By:</strong> {job.createdBy}
-          </p>
-
-          <p>
-            <strong>Created At:</strong> {formatDateTime(job.createdAt, dateFormat)}
-          </p>
-
-          <p>
-            <strong>Updated By:</strong> {job.updatedBy}
-          </p>
-
-          <p>
-            <strong>Updated At:</strong> {formatDateTime(job.updatedAt, dateFormat)}
-          </p>
+        <input type="hidden" id="id" name="id" value={job?.id ?? id} />
+        <div className="row">
+          <label className="col s12 m6">
+            {resource.published_at}
+            <Input type="datetime-local" step=".010" id="publishedAt" name="publishedAt" defaultValue={datetimeToString(job?.publishedAt)} />
+          </label>
+          <label className="col s12 m6">
+            {resource.end_date}
+            <Input type="datetime-local" step=".010" id="expiredAt" name="expiredAt" defaultValue={datetimeToString(job?.expiredAt)} />
+          </label>
+          <label className="col s12 m6 required">
+            {resource.company}
+            <Input type="text" id="company" name="company" defaultValue={job?.company} maxLength={40} required={true} placeholder={resource.company} />
+          </label>
+          <label className="col s12 m6 required">
+            {resource.position}
+            <Input type="text" id="position" name="position" defaultValue={job?.position} maxLength={100} required={true} placeholder={resource.position} />
+          </label>
+          <label className="col s12 m6 required">
+            {resource.quantity}
+            <Input
+              type="number"
+              id="quantity"
+              name="quantity"
+              dataType="integer"
+              defaultValue={job?.quantity}
+              maxLength={14}
+              min={1}
+              required={true}
+              placeholder={resource.quantity}
+            />
+          </label>
+          <label className="col s12 m6 required">
+            {resource.location}
+            <Input type="text" id="location" name="location" defaultValue={job?.location} maxLength={120} required={true} placeholder={resource.location} />
+          </label>
+          <label className="col s12 m6">
+            {resource.status}
+            <div className="radio-group">
+              <label>
+                <input type="radio" id="active" name="status" value={Status.Active} defaultChecked={job?.status === Status.Active} />
+                {resource.active}
+              </label>
+              <label>
+                <input type="radio" id="inactive" name="status" value={Status.Inactive} defaultChecked={job?.status === Status.Inactive} />
+                {resource.inactive}
+              </label>
+            </div>
+          </label>
+          <label className="col s12 m6">
+            {resource.min_salary}
+            <Input type="number" id="minSalary" name="minSalary" dataType="integer" defaultValue={job?.minSalary} min={0} placeholder={resource.min_salary} />
+          </label>
+          <label className="col s12 m6">
+            {resource.max_salary}
+            <Input type="number" id="maxSalary" name="maxSalary" dataType="integer" defaultValue={job?.maxSalary} min={0} placeholder={resource.max_salary} />
+          </label>
+          <label className="col s12 auto-height">
+            {resource.skills}
+            <AutocompleteChip id="skills" name="skills" values={job?.skills} suggestions={skillSuggestions} placeholder={resource.skills} />
+          </label>
+          <label className="col s12 m6 required">
+            {resource.title}
+            <Input type="text" id="title" name="title" defaultValue={job?.title} maxLength={300} required={true} placeholder={resource.title} />
+          </label>
+          <label className="col s12 auto-height required">
+            {resource.description}
+            <textarea id="description" name="description" defaultValue={job?.description} maxLength={9800} required={true} placeholder={resource.description} />
+          </label>
         </div>
-      </article>
+        <footer>
+          <SubmitButton
+            type="submit"
+            id="btnSubmit"
+            name="btnSubmit"
+            api={`/api/jobs/${id}`}
+            confirmHeader={resource.header_confirm}
+            confirmMessage={resource.msg_confirm_save}
+            successMessage={resource.msg_save_success}
+            errorHeader={resource.header_error}
+            forbiddenError={resource.error_403}
+            parsingError={resource.error_response_body}
+            networkError={resource.error_network}
+            conflictError={resource.error_409}
+            goneError={resource.error_410}
+            successUrl="back"
+          >
+            {resource.submit}
+          </SubmitButton>
+        </footer>
+      </form>
     )
   } catch (err) {
-    const headerList = await headers()
-    const pathname = headerList.get("x-current-path")
-
-    logger.error(`Error at ${pathname}: ${err}`)
-
+    logError(err)
     return <Error title={resource.error_500_title} message={resource.error_500_message} />
   }
 }

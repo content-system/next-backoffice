@@ -39,7 +39,7 @@ export default async function ContentsForm({ searchParams }: { searchParams: Pro
       <div>
         <header>
           <h2>{resource.contents}</h2>
-          {canWrite && <Link href="/contents/new" id="newBtn" className="btn-new" prefetch={false} />}
+          {canWrite && <Link href="/contents/new/en" id="newBtn" className="btn-new" prefetch={false} />}
         </header>
         <div className="main-body">
           <Form id="contentsForm" name="contentsForm" className="form" noValidate={true} action="/contents">
@@ -84,7 +84,7 @@ export default async function ContentsForm({ searchParams }: { searchParams: Pro
                     <td>{item.id}</td>
                     <td>{item.lang}</td>
                     <td>
-                      <Link href={`/contents/${item.id}`} prefetch={false}>
+                      <Link href={`/contents/${item.id}/${item.lang}`} prefetch={false}>
                         {item.title}
                       </Link>
                     </td>

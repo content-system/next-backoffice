@@ -17,6 +17,9 @@ export class ArticleUseCase implements ArticleService {
     protected notificationPort: NotificationPort,
     protected log: Log,
   ) {}
+  getTags(): Promise<string[]> {
+    return this.draftRepository.getTags()
+  }
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>> {
     return this.draftRepository.search(filter, limit, page, fields)
   }

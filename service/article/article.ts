@@ -38,6 +38,7 @@ export interface ArticleFilter extends Filter {
 }
 
 export interface DraftArticleRepository {
+  getTags(): Promise<string[]>
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>>
   load(id: string, tx?: Transaction): Promise<Article | null>
   create(article: Article, tx: Transaction): Promise<number>
@@ -51,6 +52,7 @@ export interface ArticleRepository {
   save(article: Article, tx: Transaction): Promise<number>
 }
 export interface ArticleService {
+  getTags(): Promise<string[]>
   search(filter: ArticleFilter, limit: number, page?: number, fields?: string[]): Promise<SearchResult<Article>>
   loadDraft(id: string): Promise<Article | null>
   load(id: string): Promise<Article | null>

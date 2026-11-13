@@ -1,4 +1,4 @@
-import { formatText } from "./format-text"
+import { formatText } from "./format"
 
 export function findParent(e: HTMLElement | null | undefined, className: string, nodeName?: string): HTMLElement | null {
   if (!e) {
